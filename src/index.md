@@ -18,7 +18,7 @@ in {{ course.room }}
 [**Steffen Smolka**][steffen]  
 <smolka@cs.cornell.edu>
 
-**Daniel Sainati** 
+**Daniel Sainati**  
 <dhs253@cornell.edu>
 
 [adrian]: http://www.cs.cornell.edu/~asampson/
