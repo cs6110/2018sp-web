@@ -4,21 +4,21 @@ fulltitle: true
 layout: layout.html
 order: 0
 ---
-{{ course.days }} \
-at {{ course.time }} \
+{{ course.days }} 
+at {{ course.time }} 
 in {{ course.room }}
 
 ### Instructor
 
-[**Adrian Sampson**][adrian] \
+[**Adrian Sampson**][adrian] 
 <asampson@cs.cornell.edu>
 
 ### Teaching Assistants
 
-[**Steffen Smolka**][steffen] \
+[**Steffen Smolka**][steffen] 
 <smolka@cs.cornell.edu>
 
-**Daniel Sainati** \
+**Daniel Sainati** 
 <dhs253@cornell.edu>
 
 [adrian]: http://www.cs.cornell.edu/~asampson/
