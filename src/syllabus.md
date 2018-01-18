@@ -51,7 +51,7 @@ You will download homework assignments, upload solutions, and receive grades thr
 
 ## Textbooks
 
-There are no required textbooks. However, if you find yourself wanting extra background, you these textbooks might be helpful:
+There are no required textbooks. However, if you find yourself wanting extra background, you might find these textbooks might be helpful:
 
 * *The Formal Semantics of Programming Languages* by Glynn Winskel.
 * *Types and Programming Languages* by Benjamin C. Pierce.
@@ -65,9 +65,10 @@ And here are a couple of good online textbooks that are relevant to the course:
 
 Final grades will be assigned with these proportions:
 
-* Problem sets: 30%
+* Problem sets: 35%
 * Preliminary exam: 30%
-* Final exam: 40%
+* Final exam: 30%
+* Participation: 5%
 
 ## Problem Sets
 
@@ -92,13 +93,23 @@ There will be a take-home prelim a non-take-home final exam. You'll be able to t
 
 Makeup exams must be scheduled within the first three weeks of class. Check the schedule now to see if you have a conflict with another class and contact the instructor immediately to reschedule.
 
+## Participation
+
+To get full credit on the 5% of your grade allocated to participation, you just have to do three things:
+
+* Drop by Adrian's office hours sometime in the first two weeks to introduce yourself.
+* Fill out the mid-semester feedback survey.
+* Fill out the semester-end course evaluation.
+
+Free points!
+
 # Policies
 
 ## Academic Integrity
 
 Absolute integrity is expected of all Cornell students in every academic undertaking. The course staff will prosecute violations aggressively using automatic detection tools.
 
-You are responsible for understanding every word of these policies:
+You are responsible for understanding these policies:
 
 - <a href="http://cuinfo.cornell.edu/Academic/AIC.html">Cornell University Code of Academic Integrity</a>
 - <a href="http://www.cs.cornell.edu/ugrad/CSMajor/index.htm#ai">Computer Science Department Code of Academic Integrity</a>
@@ -118,9 +129,7 @@ On **problem sets**, everything you turn in must be 100% completely your own wor
 Here's the policy for **exams**: You may not give assistance to anyone or receive assistance of any kind from anyone at all during an exam.
 You can use notes from the class on the take-home prelim but not on the final.
 
-You may not give any hints or post any code that might be part of a solution on Piazza.
-
-If you are unsure about what is permissible and what is not, please ask!
+You may not give any hints or post any code that might be part of a solution on Slack (except in a private message with course staff).
 
 ## Respect in Class
 
@@ -132,12 +141,12 @@ If any of the communication in this class doesn't meet these standards, please d
 
 ## Special Needs and Wellness
 
-It is university policy to provide reasonable accommodations to students who have a documented disability (e.g., physical, learning, psychiatric, vision, hearing, or systemic) that may affect their
-ability to participate in course activities or to meet course requirements. Students with disabilities are encouraged to contact <a href="http://sds.cornell.edu">Student Disability Services</a> at
-607-254-4545, or the instructor for a confidential discussion of their
+We provide accommodations for disabilities.
+Students with disabilities can contact <a href="http://sds.cornell.edu">Student Disability Services</a> at
+607-254-4545 or the instructor for a confidential discussion of their
 individual needs.
 
-If you are experiencing undue personal or academic stress at any time during the semester or need to talk to someone who can help, contact the instructor or:
+If you experience personal or academic stress or need to talk to someone who can help, contact the instructor or:
 
 - <a href="http://www.engineering.cornell.edu/student-services/academic-advising">Engineering Academic Advising</a> at 607-255-7414
 - <a href="http://lsc.sas.cornell.edu">Learning Strategies Center</a> at 607-255-6310
