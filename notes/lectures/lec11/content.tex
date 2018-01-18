@@ -1,0 +1,143 @@
+\lecture{11}
+\title{A Functional Language}
+\date{24 February 2016}
+\maketitle
+
+Let us construct a functional language \FL\ by augmenting the $\lambda$-calculus with some more conventional programming constructs. This is a richer language than any we have seen, one that we might actually like to program in. We will give semantics for this language in two ways: a structural operational semantics and a
+translation to the CBV $\lambda$-calculus. 
+
+\section{Syntax of \FL}
+
+In addition to $\lambda$-abstractions, we introduce some new primitive constructs: tuples $(\seq e1n)$, natural number constants $n$, Boolean constants $\TRUE$ and $\FALSE$, and a "letrec" construct for recursive functions. All these constructs are primitive constructs of the language; that is, they are given as part of the basic syntax, not encoded by other constructs. We could also include arithmetic and Boolean operators as before, but let's leave these out for now for simplicity of the exposition.
+
+\subsection{Expressions}
+Expressions are defined by the following BNF grammar:
+\begin{eqnarray*}
+e &::=& \lam{x_1\ldots x_n}e \bnf e_0\,e_1 \bnf x \bnf n \bnf \TRUE \bnf \FALSE\\
+&& \bnf (e_1,\ldots,e_n) \bnf \#n\,e \bnf \ifthenelse{e_0}{e_1}{e_2}\\
+&& \bnf \letin x{e_1}{e_2} \bnf \letrec{f_1}{\lam{x_1}{e_1}}{f_n}{\lam{x_n}{e_n}}e 
+\end{eqnarray*}
+where $n$ is strictly positive in projections $\#n\,e$, $\lambda$-abstractions $\lam{x_1\ldots x_n}e$, and the "letrec" construct.
+
+Computation will be performed on closed terms only. We have said what we mean by \emph{closed} in the case of $\lambda$-terms, but there are also variable bindings in the "let" and "letrec" construct, and we need to extend the definition to those cases by defining the scope of the bindings. The scope of the binding of $x$ in $\letin x{e_1}{e_2}$ is $e_2$ (but \emph{not} $e_1$!), and the scope of $f_i$ in $\letrec{f_1}{\lam{x_1}{e_1}}{f_n}{\lam{x_n}{e_n}}e$ is the entire expression, including $\seq e1n$ and $e$.
+
+\subsection{Values}
+Values are a subclass of expressions for which no reduction rules will apply. Thus values are \emph{irreducible}. There will be other irreducible terms that are not values; this will be the \emph{stuck} values.
+\begin{align*}
+v\ &::=\ \lam{x_1\ldots x_n}e \bnf n \bnf \TRUE \bnf \FALSE \bnf (v_1,\ldots,v_n) 
+\end{align*}
+
+\section{Operational Semantics}
+
+As before, we will specify our operational semantics structurally in terms of reductions and evaluation contexts.
+
+\subsection{Evaluation Contexts}
+We define evaluation contexts so that evaluation is left-to-right and deterministic.
+\begin{eqnarray*}
+E &::=& \hole \bnf E\,e \bnf v\,E \bnf \#n\,E \bnf \ifthenelse E{e_1}{e_2}\\
+&& \bnf \letin xEe \bnf (v_1,\ldots,v_m,E,e_{m+2},\ldots,e_n) 
+\end{eqnarray*}
+There are no holes on the right-hand side of "if" because
+we will want $e_1$ and $e_2$ to be evaluated lazily. Even
+in an eager, call-by-value language, we want _some_ laziness.
+
+The structural congruence rule takes the usual form:
+\[
+\Rule{e \stepsone e'}
+{E\holed{e} \stepsone E\holed{e'}}
+\]
+
+\subsection{Reductions}
+\begin{eqnarray*}
+(\lam{x_1\ldots x_n}e)\,v &\to& \subst{(\lam{x_2\ldots x_n}e)}v{x_1},\ n\geq 2\\
+(\lam xe)\,v &\to& \subst evx\\
+%n_1 \oplus n_2 &\to& n_3\quad\text{if $n_1 \oplus n_2 = n_3$ under the corresponding arithmetic operation $\oplus$}\\
+\#n\,(v_1,\ldots,v_m) &\to& v_n,\ \mbox{where $n\leq m$}\\
+\ifthenelse{\TRUE}{e_1}{e_2} &\to& e_1\\
+\ifthenelse{\FALSE}{e_1}{e_2} &\to& e_2\\
+\letin xve &\to& \subst evx\\
+"letrec" \ldots &\to& \text{(\textit{to be continued})}
+\end{eqnarray*}
+
+We can already see that there will be problems with
+soundness. For example, what happens with the expressions $\ifthenelse
+310$ or $\#5\,(\TRUE,\FALSE,\TRUE)$? In these cases, the evaluation is \emph{stuck}, because there is no reduction rule that
+applies, but the expression is not a value.
+Unlike the $\lambda$-calculus, not all expressions work
+in all contexts. We do not have an explicit notion of _type_ in this
+language to rule out such expressions.
+Typically in practice, stuck expressions constitute a _runtime type error_.
+
+\section{Translating \FL\ to $\lambda$-CBV}
+
+\subsection{Application and Abstraction, Numbers and Booleans}
+ 
+To capture the semantics of \FL, we can also translate it to the
+call-by-value $\lambda$-calculus.
+The translation is defined by structural induction on the syntax of the expression.
+For the basis of the induction, 
+\begin{align*}
+\SB x &\definedas x &
+\SB n &\definedas \lam{fx}{f^n x} &
+\SB\TRUE &\definedas \lam{xy}{x\,\ID} &
+\SB\FALSE &\definedas \lam{xy}{y\,\ID}
+\end{align*}
+The compound constructs other than tuples, projections, and "letrec" are translated as follows:
+\begin{gather*}
+\SB{\lam{x_1\ldots x_n}e} \definedas \lam{x_1}{\SB{\lam{x_2\ldots x_n}e}},\ n\geq 2 \qquad\qquad
+\SB{\lam xe} \definedas \lam x{\SB e} \qquad\qquad
+\SB{e_0\,e_1} \definedas \SB{e_0}\,\SB{e_1}\\
+\SB{\ifthenelse{e_0}{e_1}{e_2}} \definedas \SB{e_0}\,(\lam z{\SB{e_1}})\,(\lam z{\SB{e_2}}) \qquad\qquad
+\SB{\letin x{e_1}{e_2}} \definedas (\lam x{\SB{e_2}})\,\SB{e_1}\\
+\SB{"letrec" \ldots} \definedas \mbox{(\textit{to be continued})}
+\end{gather*}
+
+\subsection{Tuples}
+
+Let us consider the translation of tuples. We have already seen how to
+represent pairs in the $\lambda$-calculus. Using these constructs, we
+can define the translation from tuples to $\lambda$-CBV as follows:
+\begin{align*}
+\SB{(\,)} & \definedas \lam{xy}{x} \\
+\SB{(e_1,e_2,\ldots,e_n)} & \definedas (\lam{xyb}{b~x~y})~\SB{e_1}\,\SB{(e_2,\ldots,e_n)} \\
+\SB{\#1\,e} & \definedas \SB{e}~(\lam{xy}{x}) \\
+\SB{\#n\,e} & \definedas \SB{e}~(\lam{xy}{\SB{\#(n-1)~y}}) & n \gt 1
+\end{align*}
+The translation is not sound, because there are stuck \FL\ expressions whose translations are not stuck; for example, $\#1\,()$.
+
+\section{Recursive Functions}
+
+Recursion in \FL\ is implemented with the "letrec" construct
+\[
+\letrec{f_1}{\lam{x_1}{e_1}}{f_n}{\lam{x_n}{e_n}}e.
+\]
+This construct allows us to define mutually recursive functions, each of which is able to call itself and other functions defined in the same "letrec" block. Note that all the variables $f_i$ are in scope in the entire expression; thus any $f_i$ may occur in $e$ and in any of the bodies $e_j$ of the functions being defined. The latter occurrences represent recursive calls.
+
+For the semantics of "letrec", we will consider only the case $n=1$ for simplicity of the presentation. The operational semantics is given by the following reduction rule:
+\begin{eqnarray}
+\letrecone f{\lam x{e_1}}e &\to& \subst{e}{\subst{(\lam x{e_1})}{\letrecone f{\lam x{e_1}}f}{f}}{f}.\label{eq:letrec0}
+\end{eqnarray}
+Some explanation of this rule is in order. First, let us look at the two subexpressions
+\begin{align}
+& \letrecone f{\lam x{e_1}}f &&
+\subst{(\lam x{e_1})}{\letrecone f{\lam x{e_1}}f}{f}\label{eq:letrec1}
+\end{align}
+appearing on the right-hand side of the rule \eqref{eq:letrec0}.
+Both expressions represent the recursive function being defined, and the latter is a value. The former reduces to the latter under the rule \eqref{eq:letrec0}:
+\begin{eqnarray*}
+\letrecone f{\lam x{e_1}}f &\stepsone& \subst{f}{\subst{(\lam x{e_1})}{\letrecone f{\lam x{e_1}}f}{f}}{f}\\
+&=& \subst{(\lam x{e_1})}{\letrecone f{\lam x{e_1}}f}{f}.
+\end{eqnarray*}
+The substitution of $\letrecone f{\lam x{e_1}}f$ for free occurrences of $f$ in $\lam x{e_1}$ is what makes the function recursive. Later on in the computation, when this expression is again exposed and applied to a value $v$, we will have
+\begin{eqnarray*}
+(\letrecone f{\lam x{e_1}}f)\ v &\stepsone& (\subst{(\lam x{e_1})}{\letrecone f{\lam x{e_1}}f}{f})\ v\\
+&=& (\lam x{(\subst{e_1}{\letrecone f{\lam x{e_1}}f}{f})})\ v\quad\text{(assuming $f\neq x$)}\\
+&\stepsone& \subst{\subst{e_1}{\letrecone f{\lam x{e_1}}f}{f}}vx.
+\end{eqnarray*}
+If $f=x$, then $f$ has no free occurrences in $\lam x{e_1}$, so the expressions \eqref{eq:letrec1} both reduce to $\lam x{e_1}$. In this case the "letrec" construct is equivalent to the ordinary nonrecursive "let".
+
+For the translation to $\lambda$-CBV, recall from Lecture 5 that, using the $Y$-combinator, we can produce a fixpoint $Y(\lam f{\lam xe})$ of $\lam f{\lam xe}$. We can think of $Y(\lam f{\lam xe})$ as a recursively-defined function $f$ such that $f=\lam xe$, where the body $e$ can refer to $f$. Then we define
+\begin{eqnarray*}
+\SB{\letrecone f{\lam x{e_1}}e} &\definedas& (\lam f{\SB e})\,(Y(\lam f{\SB{\lam x{e_1}}})) .
+\end{eqnarray*}
+We should not use the original $Y$ combinator, but the more CBV-friendly combinator $Y_{\mathrm{CBV}}$ as defined in Lecture 5.

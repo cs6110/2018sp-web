@@ -1,0 +1,225 @@
+\lecture{12}
+\title{Static vs Dynamic Scope}
+\date{26 February 2016}
+\maketitle
+
+In this lecture we introduce the topic of \emph{scope} in the context
+of the $\lambda$-calculus and define translations from $\lambda$-CBV
+to \FL\ for the two most common scoping rules, \emph{static}
+and \emph{dynamic} scoping.
+
+\section{Overview}
+
+Until now, we could look at a program as written and immediately
+determine where any variable was bound.  This was possible because the
+$\lambda$-calculus uses \emph{static scoping} (also known
+as \emph{lexical scoping}).
+
+The \emph{scope} of a variable is where that variable can be mentioned
+and used.  In static scoping, the places where a variable can be used
+are determined by the lexical structure of the program.  An
+alternative to static scoping is \emph{dynamic scoping}, in which a
+variable is bound to the most recent (in time) value assigned to that
+variable.
+
+The difference becomes apparent when a function is applied.  In static
+scoping, any free variables in the function body are evaluated in the
+context of the defining occurrence of the function; whereas in dynamic
+scoping, any free variables in the function body are evaluated in the
+context of the function call.  The difference is illustrated by the
+following program:
+\[
+\begin{array}l
+\letin d2{}\\
+\letin f{\lam x{x+d}}{}\\
+\letin d1{}\\
+f\,2
+\end{array}
+\]
+In OCaml, which uses lexical scoping, the block above evaluates to 4:
+\begin{enumerate}
+\item The outer $d$ is bound to 2.
+\item The $f$ is bound to $\lam x{x+d}$.  Since $d$ is statically bound, this is will always be equivalent to $\lam x{x+2}$ (the value of $d$ cannot change, since there is no variable assignment in this language).
+\item The inner $d$ is bound to 1.
+\item When evaluating the expression $f\,2$, free variables in the body of $f$ are evaluated using the environment in which $f$ was defined.  In that environment, $d$ was bound to 2.  We get $2+2=4$.
+\end{enumerate}
+If the block is evaluated using dynamic scoping, it evaluates to 3:
+\begin{enumerate}
+\item The outer $d$ is bound to 2.
+\item The $f$ is bound to $\lam x{x+d}$.  The occurrence of $d$ in the body of $f$ is not locked to the outer declaration of $d$.
+\item The inner $d$ is bound to 1.
+\item When evaluating the expression $f\,2$, free variables in the body of $f$ are evaluated using the environment of the call, in which $d$ is 1.  We get $2 + 1 = 3$.
+\end{enumerate}
+
+Dynamically scoped languages are quite common and include many
+interpreted scripting languages.  Examples of languages with dynamic
+scoping are (in roughly chronological order): early versions of LISP,
+APL, PostScript, TeX, and Perl.  Early versions of Python also had
+dynamic scoping, but it was later changed to static scoping.
+
+Dynamic scoping does have a few advantages:
+\begin{itemize}
+\item Certain language features are easier to implement.
+\item It becomes possible to extend almost any piece of code by overriding the values of variables that are
+used internally by that piece.
+\end{itemize}
+These advantages, however, come with a price:
+\begin{itemize}
+\item Since it is impossible to determine statically what variables will be accessible at a particular point in a
+program, the compiler cannot determine where to find the correct value of a variable, necessitating a
+more expensive variable lookup mechanism. With static scoping, variable accesses can be implemented
+more efficiently, as array accesses.
+\item Implicit extensibility makes it very difficult to keep code modular: the true interface of any block of
+code becomes the entire set of variables used by that block.
+\end{itemize}
+
+\section{Scope and the Interpretation of Free Variables}
+
+Scoping rules are all about how to evaluate free variables in a
+program fragment.  With static scope, free variables of a term $\lam
+xe$ are interpreted according to the syntactic context in which the
+term $\lam xe$ occurs.  With dynamic scope, free variables of $\lam
+xe$ are interpreted according to the environment in effect when $\lam
+xe$ is applied.  These are not the same in general.
+
+We can demonstrate the difference by defining two translations
+$\SB[S]{\cdot}$ and $\SB[D]{\cdot}$ for static and dynamic scoping,
+respectively. These translations will convert $\lambda$-CBV with the
+corresponding scoping rule into \FL.
+
+For both translations, we use environments to capture the
+interpretation of names. An \emph{environment} is simply a partial
+function with finite domain from variables $x$ to values.
+\[
+\rho : \Var \pfun \Val
+\]
+Let $\rebind\rho vx$ denote the environment that is identical to
+$\rho$ except that its value at $x$ is $v$:
+\begin{eqnarray*}
+\rebind\rho vx(y) &\definedas& \begin{cases}
+\rho(y), & y\neq x,\\
+v, & y=x.
+\end{cases}
+\end{eqnarray*}
+The set of all environments is denoted \Env. The meta-operator $\rebind{}vx$ is called a \emph{rebinding operator}.
+
+We will need a mechanism to represent environments in the target language.  For this purpose we need to
+code variables and environments as values of the target language.  We write $\dq x$ to represent the
+code of the variable $x$.  The exact nature of the coding is unimportant,
+as long as it is possible to look up the value of a variable
+given its code and update an environment with a new binding.
+Thus the only requirement is that there be definable methods "lookup" and "update" in the target language such that for any variable $x$ and value $v$, if $\rho'$ is a representation of the environment $\rho$, then
+\begin{eqnarray*}
+\lookup{\rho'}x &=& \begin{cases}
+\rho(x), & \text{if } x\in\dom\rho,\\
+\error, & \text{if } x\not\in\dom\rho
+\end{cases}
+\end{eqnarray*}
+and $\update{\rho'}vx$ is a representation of $\rebind\rho v x$.
+
+For example, we might represent variables
+as integers and environments as a functions that take an integer input $n$ and return the value associated
+with the variable whose code is $n$, or "error" if there is no such binding.  With this encoding, the
+empty environment would be $\lam n{\error}$,
+and the environment that binds only the variable $y$ to 2 could be represented as
+\[
+\lam n{\ifthenelse{n = \dq y}{2}{\error}}.
+\]
+With this encoding we could define
+\begin{align*}
+"lookup"\ &\definedas\ \lam{\rho n}{\rho(n)} &
+"update"\ &\definedas\ \lam{\rho vn}{\lam m{\ifthenelse{m=n}v{\rho(m)}}}.
+\end{align*}
+
+Given such an encoding, let $\Env'$ denote the set of all representations of environments
+in the target language.
+The meaning of a language expression $e$ is relative to the environment
+in which $e$ occurs. Therefore, the meaning $\SB{e}$ is a function from
+environments to expressions in the target language,
+\begin{displaymath}
+\SB{e} : \Env' \to \FL,
+\end{displaymath}
+where \FL\ represents the set of all target language expressions.
+Thus $\SB{e} \rho$ is an expression in the target language \FL\ involving values and environments
+that can be evaluated under the usual \FL\ rules to produce a value.
+
+\section{Static Scoping}
+
+The translation for static scoping is:
+\begin{align*}
+\SB[S] x\,\rho\ &\definedas\ \lookup\rho x\\
+\SB[S]{e_1\,e_2}\,\rho\ &\definedas\ {(\SB[S]{e_1}\,\rho)\,(\SB[S]{e_2}\,\rho)}\\
+\SB[S]{\lam xe}\,\rho\ &\definedas\ \lam v{\SB[S] e\,(\update\rho vx)}.
+\end{align*}
+
+There are a couple of things to notice about this translation. It
+eliminates all of the variable names from the source program and
+replaces them with new names that are bound immediately at the same
+level. All $\lambda$-terms are closed, so there is no longer any role
+for the scoping mechanism of the target language to decide what to do
+with free variables.
+
+\section{Dynamic Scoping}
+
+The translation for dynamic scoping is:
+\begin{align}
+\SB[D] x\,\rho\ &\definedas\ \lookup\rho x\nonumber\\
+\SB[D]{e_1\,e_2}\,\rho\ &\definedas\ (\SB[D]{e_1}\,\rho)\,(\SB[D]{e_2}\,\rho)\,\rho\label{eqn:ds2}\\
+\SB[D]{\lam xe}\,\rho\ &\definedas\ \lam{v\tau}{\SB[D]e\,(\update\tau vx)}\label{eqn:ds3}
+\end{align}
+In \eqref{eqn:ds3}, we have thrown out the lexical environment $\rho$ and replaced it with
+a parameter $\tau$.  Thus the translation of a function no longer expects just
+a single argument $v$; it also expects to be
+provided with an environment $\tau$ describing the variable bindings at
+the call site.  This environment is passed in to the function
+when it is called, as shown in \eqref{eqn:ds2}.
+
+Because a function can be applied in different and unpredictable
+locations that can vary at runtime, it is difficult in general to come up with an efficient
+representation of dynamic environments.
+
+\section{Correctness of the Static Scoping Translation}
+
+That static scoping is the scoping discipline of $\lambda$-CBV is captured in the following theorem.
+
+\begin{theorem}
+For any $\lambda$-CBV expression $e$ and $\rho\in\Env$ such that $\FV e\subseteq\dom\rho$, let $\rho'\in\Env'$ be a representation of
+$\rho$.  Then $\SB[S]e\,\rho'$ is $\beta\eta$-equivalent to $\subst e{\rho(y)}{y \mid y\in\Var}$.
+\end{theorem}
+\begin{proof}
+By structural induction on $e$.  For variables and applications,
+\begin{eqnarray*}
+\SB[S] x\,\rho' &=& \lookup{\rho'}x\ =\ \rho(x)\ =\ \subst x{\rho(y)}{y \mid y\in\Var}\\[1ex]
+\SB[S]{e_1\,e_2}\,\rho' &=& (\SB[S]{e_1}\,\rho')\,(\SB[S]{e_2}\,\rho')\\
+&=& (\subst{e_1}{\rho(y)}{y\mid y\in\Var})\,(\subst{e_2}{\rho(y)}{y \mid y\in\Var})\\
+&=& \subst{(e_1\,e_2)}{\rho(y)}{y \mid y\in\Var}.
+\end{eqnarray*}
+For a $\lambda$-abstraction $\lam xe$, for any value $v$,
+since $\update{\rho'}vx$ is a representation for $\rebind\rho vx$,
+by the induction hypothesis
+\begin{equation}
+\begin{array}{rcl}
+\SB[S] e\,(\update{\rho'}vx)
+&=_{\lefteqn{\scriptstyle\beta\eta}}& \subst e{\rebind\rho vx(y)}{y \mid y\in\Var}\\
+&=& \subst{\subst e{\rho(y)}{y \mid y\in\Var-\{x\}}}vx\\
+&=_{\lefteqn{\scriptstyle\beta}}& (\lam x{\subst e{\rho(y)}{y \mid y\in\Var-\{x\}}})\,v\\
+&=& (\subst{(\lam xe)}{\rho(y)}{y \mid y\in\Var})\,v.
+\end{array}
+\label{eqn:etaS}
+\end{equation}
+Then
+\begin{eqnarray*}
+\SB[S]{\lam xe}\,\rho'
+&=& \lam v{\SB[S] e\,(\update{\rho'}vx)}\\
+&=& \lam v{(\subst{(\lam xe)}{\rho(y)}{y \mid y\in\Var})\,v}\qquad\text{by \eqref{eqn:etaS}}\\
+&=_{\lefteqn{\scriptstyle\eta}}& \subst{(\lam xe)}{\rho(y)}{y \mid y\in\Var}.
+\end{eqnarray*}
+\end{proof}
+
+The pairing of a function $\lam xe$ with an environment $\rho$ is
+called a \emph{closure}.  The theorem above says that $\SB[S]{\cdot}$
+can be implemented by forming a closure consisting of the term $e$ and
+an environment $\rho$ that determines how to interpret the free
+variables of $e$.  By contrast, in dynamic scoping, the translated
+function does not record the lexical environment, so closures are not
+needed.

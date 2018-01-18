@@ -1,0 +1,415 @@
+\NeedsTeXFormat{LaTeX2e}[2.09]
+\ProvidesPackage{exam}[2014/09/26 v2.9 exam style file]
+
+% Exam style file package for LaTeX
+% Andrew Myers, Cornell University
+% Originally written April 2004
+  % Use grep '^%' to extract documentation
+%
+\DeclareOption{solution}{\solutiontrue}
+\DeclareOption{bluebook}{\bluebooktrue}
+\DeclareOption{instructions}{\instructionstrue}
+\DeclareOption{boxanswers}{\boxanswerstrue}
+\DeclareOption{example}{\boxanswersfalse\instructionsfalse\bluebooktrue\solutionfalse\exampletrue}
+
+% Package options:
+%
+%   solution: include solutions, don't put problems on separate pages
+%   bluebook: do not leave space to answer questions 
+%   instructions: include exam instructions
+%   boxanswers: draw a box around answers
+%
+%\newif\ifsolution
+\newif\ifbluebook
+%\newif\ifinstructions
+\newif\ifboxanswers
+\newif\ifgraders
+\newif\ifexample
+\solutionfalse
+\bluebookfalse
+\instructionsfalse
+\boxanswersfalse
+\examplefalse
+
+\ProcessOptions
+
+% Enable solutions based on -jobname: if the job has -sol in the name,
+% solutions are automatically enabled.
+\usepackage{substr}
+\IfSubStringInString{\detokenize{-sol}}{\jobname}{\solutiontrue}{\instructionstrue}
+
+% Commands:
+%
+% \maketitle creates the standard exam header
+% \title{title} sets the name of the exam
+% \date{date} sets the date of the exam
+%
+% moved to 6110.cls - dk
+%
+%\renewcommand\maketitle{
+%\begin{flushleft}
+%{\large
+%\textsf{\@title \hfill \@date}}\\
+%\hrulefill
+%\end{flushleft}
+%\ifsolution{\hfil\LARGE\bf Solutions\hfil}\fi
+%}
+
+% All questions are found in the 'questions' environment, e.g.:
+% \begin{questions}
+%  \question{name}{pts}
+%  \question{name}{pts}
+%  ...
+% \end{questions}
+% \label{lastpage}
+% \end{document}
+%  
+% \numquestions is the number of questions in the exam.
+%
+\newenvironment{questions}{
+\begin{enumerate}}%
+{
+\writenumquestions{\number\value{enumi}}
+\exam@checkpartpts\end{enumerate}}
+
+
+ % numq: a counter for keeping track of the number of questions.
+\newcounter{numq}
+\def\exam@numq#1{\setcounter{numq}{#1}}
+
+\AtBeginDocument{ % delay until we read in the .aux file if any...
+\ifx\c@numq\@undefined%
+\newcommand\numquestions{1}%
+\else%
+\newcommand\numquestions{\number\value{numq}}%
+\fi
+}
+
+ % write out the number of questions
+\def\writenumquestions#1{%
+\protected@write\@auxout{}%
+{\string\exam@numq{#1}}}
+
+% \questionpts{N} gives the number of points assigned to question N.
+%
+\newcommand\questionpts[1]{%
+\@ifundefined{exam@questionpts\romannumeral #1}
+{???%
+\PackageWarning{exam}{Question #1 does not have an assigned point value}}
+{\csname exam@questionpts\romannumeral #1\endcsname}%
+}
+
+\newcommand\exam@questionpts[2]{\expandafter\gdef%
+  \csname exam@questionpts\romannumeral #1\endcsname {#2}%
+\addtocounter{exam@total}{#2}%
+}
+
+\newcounter{exam@partnum}
+\newcounter{exam@total}
+\newcounter{exam@questiontotal}
+
+% \totalpts is the total number of points in all questions.
+%
+\newcommand\totalpts{\arabic{exam@total}}
+
+% \question{title}{points} introduces a new question
+%
+\newcommand\question[2]{%
+\ifnum\@enumdepth > 1%
+\PackageError{exam}{Exam questions cannot be nested inside lists}\@eha%
+\else%
+\exam@checkpartpts%
+\ifbluebook\relax\else\dnp\fi%
+\item \question@name{#1} \pts{#2}%
+\setcounter{exam@partnum}{0}%
+\setcounter{exam@questiontotal}{0}%
+\writequestionpts{\number\value{enumi}}{#2}%
+\fi%
+\@ifnextchar\par{\relax}{\quad\ignorespaces}%
+}
+
+\newcommand\question@name[1]{\textbf{#1}}
+
+ % Write question point information to .aux
+\newcommand\writequestionpts[2]{%
+\exam@questionpts{\number\value{enumi}}{#2}%
+\protected@write\@auxout{}%
+{\string\exam@questionpts{#1}{#2}}%
+}
+
+ % Check whether the points on the parts sum up to the declared
+ % total for the question.
+\def\exam@checkpartpts{
+\ifnum \number\value{enumi}=0
+\relax
+\else
+\@ifundefined{exam@questionpts\romannumeral\number\value{enumi}}%
+{}% don't have the data yet
+{
+\def\m{\number\value{exam@questiontotal}}
+\def\n{\questionpts{\number\value{enumi}}}
+\ifnum\value{exam@partnum}=0
+\relax
+\else
+\ifnum \m=\n
+\relax
+\else
+\PackageWarning{exam}{Question \number\value{enumi}: total of parts is \m, expected \n}%
+\fi
+\fi
+}
+\fi
+}
+
+% Question parts occur within the 'parts' environment. It keeps track of
+% the current part number, so you can have multiple parts environments
+% within a single question. E.g.,
+% \question{title}{points}
+%   \begin{parts}
+%     \newpart{10} ...
+%     \newpart{15} ...
+%   \end{parts} ...
+%
+\newenvironment{parts}{
+\ifnum\@enumdepth = 1
+\begin{enumerate}
+\setcounter{enumii}{\value{exam@partnum}}
+\else
+\PackageError{exam}{Question parts must occur inside questions}\@eha%
+\fi}%
+{\setcounter{exam@partnum}{\value{enumii}}%
+\end{enumerate}}
+
+% A problem part is introduced as \newpart{points}
+%
+\newcommand\newpart[1]{%
+\ifnum\@enumdepth = 2
+\item \makebox[4em][l]{\pts{#1}}%
+\addtocounter{exam@questiontotal}{#1}%
+\writequestionpart{\number\value{enumi}}{\number\value{enumii}}%
+\expandafter\gobblepars%
+\else
+\PackageError{exam}%
+{Question parts must occur inside the "parts" environment}\@eha%
+\fi
+}
+
+\newcommand\gobblepars{%
+  \@ifnextchar\par%
+    {\expandafter\gobblepars\@gobble}%
+    {}%
+}
+
+\newcommand\writequestionpart[2]{%
+\protected@write\@auxout{}%
+{\string\exam@questionpart{#1}{#2}}%
+}
+
+\newcommand\exam@questionpart[2]{%
+  \expandafter\gdef%
+  \csname exam@questionpart@\romannumeral #1\endcsname {#2}%
+}
+
+% The comment \showparts generates "parts a-x" where "x" is
+% the last part of the current problem.
+%
+\newcommand\showparts{parts a--\lastpart}
+
+% \lastpart is the name of the last part of the current problem
+%
+\newcommand\lastpart{%
+\def\n{\romannumeral\value{enumi}}%
+\@ifundefined{exam@questionpart@\n}{???%
+\PackageWarning{exam}{Number of parts for question \arabic{enumi} is not yet known}}{%
+\def\n{\roman{enumi}}%
+\@alph{\csname exam@questionpart@\n\endcsname}%
+}}
+
+% The environment tfparts is like parts, but \newpart leaves a space
+% to write an answer and there is no point value given.
+%
+\newenvironment{tfparts}{
+\begin{parts}
+\ifsolution
+\else
+\renewcommand{\theenumii}{\alph{enumii}. \answerslot~}
+\setlength{\itemsep}{1.5ex}
+\fi
+\renewcommand\newpart[1]{%
+\writequestionpart{\number\value{enumi}}{\number\value{enumii}}
+\ifnum\@enumdepth = 2
+\item%
+\addtocounter{exam@questiontotal}{##1}
+\writequestionpart{\number\value{enumi}}{\number\value{enumii}}
+\else
+\PackageError{exam}%
+{Question parts must occur inside the "parts" environment}\@eha%
+\fi
+}}%
+{\end{parts}}
+\newcommand\answerslot{\underline{\hspace*{2em}}}
+
+% \setanswerstyle{...}
+%    Change the default style, color, etc. of answer text
+%    E.g., \setanswerstyle{\color{red}\em}
+%
+\newcommand\setanswerstyle[1]{\gdef\@answerstyle{#1}}
+\newcommand\@answerstyle{\em} % typeset answers in italics by default
+
+% \ans{lines}{answer}
+%   Depending on whether the solution option is used, either gives the
+%   answer or leaves "lines" lines of blank space (if bluebook option not used.)
+% \tfans{answer}
+%   Gives the answer to a true/false question if [solution] is used.
+%   Doesn't leave blank space if not the solution version.
+% \begin{answer}{lines}...\end{answer}
+%   Works like \ans but interprets the answer text
+%   in a more robust way. This helps if you are trying to put in
+%   verbatim code.
+% \begin{answerifsoln}...\end{answerifsoln}
+%   Wrap around a question that turns into the answer in the solution version.
+%   It has no effect if this is not the solutions, but wraps a box around it
+%   if it is the solutions.
+%
+
+\newsavebox\box@ans
+
+\ifsolution
+\newcommand{\ans}[2]{%
+\begin{answer}{#1}%
+#2%
+\end{answer}}
+
+\newcommand{\tfans}[1]{\begin{center}{\@answerstyle #1}\end{center}}
+
+\newenvironment{answer}[1]{\par%
+\ifboxanswers % adjust the linewidth so the text box fits inside the fbox
+\advance\linewidth -\fboxsep
+\advance\linewidth -\fboxsep
+\advance\linewidth -\fboxrule
+\advance\linewidth -\fboxrule
+\fi
+\hsize\linewidth
+\setbox\box@ans\hbox\bgroup
+\begin{minipage}{\linewidth}
+\color@setgroup\@answerstyle
+}{\color@endgroup\end{minipage}\egroup\presentanswer{\box\box@ans}}
+\else
+\newcommand{\ans}[2]{\ifbluebook\else\vspace{#1\baselineskip}\ifnum #1>0 \vfil\fi\fi}
+\newenvironment{answer}[1]{\ifbluebook\relax\else\vspace{#1\baselineskip}\ifnum #1>0 \vfil\fi\fi%
+\setbox\box@ans\vbox\bgroup}{\egroup} % consume the answer
+
+\newcommand{\tfans}[1]{}
+\fi
+
+
+\newenvironment{answerifsoln}{\par%
+\ifsolution
+\ifboxanswers % adjust the linewidth so the text box fits inside the fbox
+\advance\linewidth -\fboxsep
+\advance\linewidth -\fboxsep
+\advance\linewidth -\fboxrule
+\advance\linewidth -\fboxrule
+\fi
+\hsize\linewidth
+\setbox\box@ans\hbox\bgroup
+\begin{minipage}{\linewidth}
+\color@setgroup\@answerstyle
+\fi
+}{\ifsolution
+\color@endgroup\end{minipage}\egroup\presentanswer{\box\box@ans}%
+\else\relax\fi}
+
+% \choice, \rightchoice: these are useful for providing a space for
+% people to write an X to choose among alternatives. They take an
+% argument.
+%
+%\newcommand\@markchoice[2]{\underline{\makebox[5ex]{#1}} #2 \\}
+%\newcommand\choice[1]{\@markchoice{}{#1}}
+%\ifsolution
+%\newcommand\rightchoice[1]{\@markchoice{X}{#1}}
+%\else
+%\newcommand\rightchoice[1]{\choice{#1}}
+%\fi
+
+% \np : do a \newpage in the test version, no \newpage in the solutions.
+%
+\ifsolution
+\def\np{\relax}
+\def\dnp{\relax}
+\else
+\ifexample
+ \def\np{\relax}
+ \def\dnp{\relax}
+\else
+ \def\np{\newpage}
+ \def\dnp{\cleardoublepage}
+\fi
+\fi
+
+% \scorebox: Generate a box to write the scores of all the questions in.
+
+\newcommand\scorebox{
+    \def\makelines##1{%
+    \addtocounter{##1}{1}%
+    \arabic{scoreboxqnum} & \questionpts{\value{##1}} & & \\ %
+    \ifnum\value{##1} < \numquestions \hline\makelines{##1} \fi%
+    }
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    Problem & Points & Score & Grader \\ \hline\hline%
+    \newcounter{scoreboxqnum}%
+    \makelines{scoreboxqnum}\hline\hline%
+    Total & \totalpts &  & \\ \hline
+    \end{tabular}
+}
+
+%
+% Miscellaneous formatting support
+% --------------------------------
+%
+% \pts{n} is used to write the number of points [n] that
+% a question or part of a question is written. This can
+% be overridden.
+%
+\newcommand{\pts}[1]{{[#1 \ifnum #1=1 pt\else pts\fi]}}
+
+% \presentanswer{text} is used to present the answer 'text'.
+% Can be overridden to present answers differently.
+
+\newcommand\presentanswer[1]{
+\ifboxanswers
+    \fbox{\parbox{\linewidth}{\textbf{Answer:}\nopagebreak\par\vspace{1ex}\par #1}}%
+\else
+    \parbox{\linewidth}{\textbf{Answer:}\nopagebreak\par\vspace{1ex}\par #1}%
+\fi
+}
+
+%
+% References to problem parts are generated to look
+% like "1(a)" rather than "1a".
+%
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{(\alph{enumii})}
+
+% Page layout has 1-inch side margins and 0.75-inch top margin
+% on letter-size paper
+%
+\ifexam
+\pdfpagewidth 8.5 in
+\pdfpageheight 11 in
+
+\paperwidth 8.5 in
+\paperheight 11 in
+\hoffset 0 in
+\voffset -0.75 in
+\oddsidemargin 0 in
+\evensidemargin 0 in
+\topmargin 0 in
+\headheight 0.25 in
+\headsep 0.25 in
+\textwidth 6.5 in         % Width of text line.
+\textheight 9.5 in
+\footskip 0.25 in
+\fi

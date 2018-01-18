@@ -1,0 +1,170 @@
+\usepackage{fancyhdr,microtype,amsmath}
+\usepackage[font={sf,small},labelfont=bf,format=hang]{caption}
+\usepackage{xspace}
+
+\def\ttquot@ttfont{\tt}
+
+\pdfpagewidth 8.5 in
+\pdfpageheight 11 in
+
+\paperwidth 8.5 in
+\paperheight 11 in
+\hoffset 0 in
+\voffset -1 in
+\oddsidemargin 0 in
+\evensidemargin 0 in
+\topmargin 0 in
+\headheight 0.75 in
+\headsep 0.25 in
+\textwidth 6.5 in
+\textheight 9 in
+\marginparsep 0.25 in
+\marginparwidth 0.75 in
+\footskip 0.5 in
+
+\renewcommand{\lhead}[2][L]{\fancyhead[#1]{\footnotesize{#2}}}
+\renewcommand{\chead}[2][C]{\fancyhead[#1]{\footnotesize{#2}}}
+\renewcommand{\rhead}[2][R]{\fancyhead[#1]{\footnotesize{#2}}}
+\renewcommand{\lfoot}[2][L]{\fancyfoot[#1]{\footnotesize{#2}}}
+\renewcommand{\cfoot}[2][C]{\fancyfoot[#1]{\footnotesize{#2}}}
+\renewcommand{\rfoot}[2][R]{\fancyfoot[#1]{\footnotesize{#2}}}
+\renewcommand{\headrulewidth}{0pt} %Do not print a rule below the header
+\renewcommand{\footrulewidth}{0pt} %Do not print a rule above the footer
+
+\newcommand{\websemester}{2017sp}
+\newcommand{\webcourse}{http://www.cs.cornell.edu/courses/cs6110/}
+\newcommand{\instructoremail}{asampson@cs.cornell.edu}
+
+\usepackage{ifpdf}
+\ifpdf
+\pdfoptionpdfminorversion 6
+\usepackage[pdftex,colorlinks=false]{hyperref}
+\else
+\usepackage[xetex,colorlinks=false]{hyperref}
+\fi
+\hypersetup{
+pdfauthor=\coursenumber~\semester,
+pdftitle=Assignment \@homework\ifsolution~Solutions\fi,
+%pdfsubject=\topic
+}
+
+\newcommand{\email}[1]{\href{mailto:#1}{\tt #1}}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shapes}
+\tikzset{every picture/.style={semithick}}
+\IfFileExists{../.oldpgf}
+	{
+		\usetikzlibrary{arrows}
+		\tikzset{arrow/.style={semithick, ->, >=latex}}
+	}
+	{
+		\usetikzlibrary{arrows.meta}
+		\tikzset{arrow/.style={semithick, ->, arrows=-{Latex[length=7pt]}}}
+	}
+
+\usepackage{listings}
+    \lstset{language=java}
+    \lstset{basicstyle=\normalsize\tt}
+    \lstset{numberstyle=\scriptsize\it}
+    \lstset{keywordstyle=\normalsize\tt\bfseries}
+    \lstset{xleftmargin=0em}
+    \lstset{numbers=left}
+    \lstset{numbersep=1em}
+    \lstset{numberblanklines=true}
+    \lstset{lineskip=0pt}
+    \lstset{escapeinside={(*}{*)}}
+    \lstset{columns=flexible}
+    \lstset{tabsize=2}
+    \lstset{deletekeywords={int,float,double,char}}
+
+\newcommand{\oth}{\textsuperscript{th}\xspace}
+\newcommand{\ost}{\textsuperscript{st}\xspace}
+\newcommand{\ond}{\textsuperscript{nd}\xspace}
+\newcommand{\ord}{\textsuperscript{rd}\xspace}
+
+\usepackage{enumitem}
+\usepackage{textcomp}
+
+\newcommand{\lAb}{\textlangle}
+\newcommand{\rAb}{\textrangle}
+
+\setlength{\parskip}{0.5ex}
+
+\pagestyle{fancy}
+\lhead{}
+\chead{}
+\rhead{}
+\lfoot{\coursenumber~\semester}
+\cfoot{\thepage/\pageref{LastPage}}
+\rfoot{Assignment~\@homework\ifsolution~Solutions\fi}
+
+%\usepackage{scrextend}
+\usepackage{etoolbox}
+\appto{\ttfamily}{\frenchspacing}
+
+\usepackage{comment}
+
+\newcommand{\headerBase}[1]{
+\begin{center}
+{\Large\bf \coursenumber---\semester}\\
+{\bf{\large\@homework\xspace\ifsolution Solution\fi}\\\topic}
+#1
+\end{center}
+}
+
+\newcommand{\header}{\headerBase{\ifsolution\relax\else\\Due: \duedate\fi}}
+
+\newcommand{\extref}[1]{{\NoHyper\ref{#1}\endNoHyper}\xspace}
+
+\newcommand\@gobblepars{%
+    \@ifnextchar\par%
+        {\expandafter\@gobblepars\@gobble}%
+        {}}
+
+\setlist[itemize]{leftmargin=*,itemsep=0.25ex,parsep=0.5ex,topsep=0.25ex}
+\setlist[enumerate]{leftmargin=*,itemsep=0.5ex,parsep=0.5ex,topsep=0.25ex}
+
+\newlist{homework}{enumerate}{1} % 1 is max depth
+\setlist[homework]{resume,label=\arabic*.,ref=\arabic*,font=\bf,%
+leftmargin=*,listparindent=0em}
+
+\newcommand{\problem}[1]{\item\textbf{#1.}\par\nobreak\@afterheading\everypar{\noindent}}
+
+\newlist{questionnaire}{itemize}{1} % 1 is max depth
+\setlist[questionnaire]{label=,align=left,font=\bf,%
+leftmargin=*,labelwidth=0pt,listparindent=0em}
+
+\newcommand{\query}[1]{\item[\textbf{#1.}]\mbox{}\par\nobreak\@afterheading\noindent}
+
+\newlist{subproblem}{enumerate}{2} % 2 is max depth
+\setlist[subproblem]{label=(\alph*),ref=(\alph*),%
+leftmargin=*,listparindent=0em}
+
+\newlist{problempart}{enumerate}{3} % 3 is max depth
+\setlist[problempart]{label=(\roman*),ref=(\roman*),%
+leftmargin=*,listparindent=0em}
+
+\newcommand{\swirl}{\includegraphics[height=2ex]{karma_symbol.pdf}}
+
+\newcommand{\swirlEmpty}{\includegraphics[height=2ex]{karma_symbol_empty.pdf}}
+
+\newcommand{\KARMA}{\texorpdfstring{\raise
+-3pt\hbox{\protect\includegraphics[height=2.5ex]{karma.pdf}}}{Karma}}
+
+\newcommand{\karma}{\includegraphics[height=1.5ex]{../figures/karma_text.pdf}\xspace}
+
+\newcommand{\Karma}[1]{\noindent\karma{\large\bf{:}}\ %
+  \foreach \n in {1,...,#1}{\swirl}%
+  \ifboolexpr{test {\ifnumless{#1}{5}}}{%
+    \foreach \n in {#1,...,4}{\swirlEmpty}%
+  }{}
+}
+
+\ifinstructions
+\setcounter{section}{-1}
+\fi
+
+%\newcommand\set[1]{\ensuremath{\{#1\}}}
+\newcommand{\alt}{\textbar\xspace}

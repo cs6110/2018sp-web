@@ -1,0 +1,315 @@
+\lecture{21}
+\title{Products, Sums, and Other Datatypes}
+\date{11 April 2016}
+\maketitle
+
+\section{Introduction}
+
+In this lecture, we add constructs to the typed $\lambda$-calculus that
+allow working with more complicated data structures, such as pairs,
+tuples, records, sums and recursive functions. We also provide
+denotational semantics for these new constructs.
+
+\section{Recap---The Typed $\lambda$-Calculus $\lambda^\to$}
+
+\subsection{Syntax}
+
+\[
+\begin{array}{lrcl}
+\mbox{terms} & e &::=& n \bnf "true" \bnf "false" \bnf "null" \bnf x \bnf e_1\,e_2 \bnf \lam{\type x\tau}e\\
+\mbox{types} & \tau &::=& "int" \bnf "bool" \bnf "unit" \bnf \tau _1 \to \tau _2\\
+\mbox{values} & v &::=& n \bnf "true" \bnf "false" \bnf "null" \bnf \lam{\type x\tau}e\ \mbox{closed}
+\end{array}
+\]
+Previously, with the untyped $\lambda$-calculus, we encoded integers and Booleans as $\lambda$-terms. In $\lambda^\to$, we are taking them as primitive constructs.
+
+\subsection{Typing Rules}
+
+\[
+\begin{array}{c@{\hspace{1cm}}c@{\hspace{1cm}}c@{\hspace{1cm}}c}
+\Gjudge n{"int"} & \Gjudge{"true"}{"bool"} & \Gjudge{"false"}{"bool"} & \Gjudge{"null"}{"unit"}
+\end{array}
+\]
+\begin{center}
+\begin{tabular}{c@{\hspace{1cm}}c@{\hspace{1cm}}c}
+$\judge{\Gamma,\,\type x\tau}x\tau$ & \Rule{\Gjudge{e_0}{\sigma\to\tau}\quad\Gjudge{e_1}\sigma}{\Gjudge{e_0\,e_1}{\tau}}
+& \Rule{\judge{\Gamma,\,\type x\sigma}e{\tau}}{\Gjudge{(\lam{\type x\sigma}e)}{\sigma\to\tau}}
+\end{tabular}
+\end{center}
+
+\section{Simple Data Structures}
+
+Each data structure can be added by extending the syntax of expressions ($e$), types ($\tau$) and values ($v$). The evaluation contexts ($E$) will also need to be extended, and evaluation and type derivation rules added to work with the new syntax.
+
+\subsection{Pairs}
+
+Syntax:
+\begin{eqnarray*}
+  e &::=& \cdots \bnf (e_1, e_2) \bnf "\#1"\,e \bnf "\#2"\,e \\
+  \tau &::=& \cdots \bnf \tau_1 * \tau_2 \\
+  v &::=& \cdots \bnf (v_1, v_2) \\
+  E &::=& \cdots \bnf (E,e) \bnf (v,E) \bnf "\#1"\,E \bnf "\#2"\,E
+\end{eqnarray*}
+For every added syntactic form, we observe that we have expressions
+that {\em introduce} the form, and expressions that {\em eliminate}
+the form. In the case of pairs, the introduction expression is
+$(e_1,e_2)$, and the elimination expressions are $\#1\,e$ and $\#2\,e$.
+
+Evaluation rules:
+\[
+"\#1"\,(v_1,v_2) \to v_1 \qquad "\#2"\,(v_1,v_2) \to v_2
+\]
+Note that these rules define _eager_ evaluation, because we only
+select from a pair when both elements are already evaluated to a value.
+
+Typing rules:
+\[
+\frac{\Gjudge{e_1}{\tau_1} \quad \Gjudge{e_2}{\tau_2}}{\Gjudge{(e_1,e_2)}{\tau_1*\tau_2}} \qquad
+\frac{\Gjudge e{\tau_1*\tau_2}}{\Gjudge{"\#1"\,e}{\tau_1}}
+\qquad
+\frac{\Gjudge e{\tau_1*\tau_2}}{\Gjudge{"\#2"\,e}{\tau_2}}
+\]
+
+\subsection{Tuples}
+
+Syntax:
+\(
+  e &::=& \cdots \bnf (e_1,\ldots, e_n) \bnf \#n\,e \\
+  \tau &::=& \cdots \bnf \tau_1 *\cdots *\tau_n \\
+  v &::=& \cdots \bnf (v_1,\ldots, v_n) \\
+  E & ::=& \cdots \bnf (v_1,\ldots,v_{i-1},E,e_{i+1},\ldots,e_n) \bnf \#n\,E
+\)
+
+Evaluation rules:
+\[
+\#m\,(v_1,\ldots,v_n) \to v_m,\quad 1\leq m\leq n
+\]
+
+Typing rules:
+\[
+\Rule{\Gjudge{e_i}{\tau_i},\ 1\leq i\leq n}
+{\Gjudge{(e_1,\ldots,e_n)}{\tau_1*\cdots*\tau_n}} \qquad
+\Rule{\Gjudge e{\tau_1*\cdots*\tau_n}}{\Gjudge{\#m\,e}{\tau_m}},\quad 1\leq m\leq n
+\]
+
+\subsection{Records}
+
+A _record_ is like a tuple with names---or, if you prefer, like a "struct" in
+C. Each entry is _labeled_ with a name from a countable set of labels,
+$\mathrm{Lab}$.
+
+Syntax:
+\(
+  l &\in& \mathrm{Lab} \\
+  e &::=& \cdots \bnf \{l_1=e_1,\ldots, l_n=e_n\} \bnf e.x \\
+  \tau &::=& \cdots \bnf \{l_1:\tau_1, \ldots, l_n:\tau_n\} \\
+  v &::=& \cdots \bnf \{l_1=v_1,\ldots, l_n=v_n\} \\
+  E & ::=& \cdots \bnf \{l_1=v_1,\ldots,l_{i-1}=v_{i-1},l_i=E,
+       l_{i+1}=e_{i+1},\ldots,l_n=e_n) \bnf E.x
+\)
+The names of the fields $l_i$ are included as part of the type.
+
+Evaluation rule:
+\[
+\{l_1=v_1,\ldots,l_n=v_n\}.l_i \to v_i,\quad 1\leq i\leq n
+\]
+
+Typing rules:
+\[
+\Rule{\Gjudge{e_i}{\tau_i},\ 1\leq i\leq n}
+{\Gjudge{\{l_1=e_1,\ldots,l_n=e_n)}{\{l_1:\tau_1, \ldots, l_n:\tau_n\}}}
+\qquad
+\frac{\Gjudge e{\{l_1:\tau_1, \ldots, l_n:\tau_n\}}}{\Gjudge{e.l_i}{\tau_i}},\ 1\leq i \leq n
+\]
+
+\subsection{Sums}
+
+Sums are useful for representing datatypes that can have multiple forms. For example, a tail of a list can either be another nonempty
+list or "null".
+
+Syntax:
+\(
+  e &::=& \cdots \bnf \inL_{\tau_1+\tau_2} e \bnf \inR_{\tau_1+\tau_2} e \bnf \matchwith{e_0}{e_1}{e_2}\\
+  \tau &::=& \cdots \bnf \tau_1+\tau_2 \\
+  v &::=& \cdots \bnf \inL_{\tau_1+\tau_2}~v \bnf \inR_{\tau_1+\tau_2}~v\\
+  E & ::=& \cdots \bnf \inL_{\tau_1+\tau_2}\,E \bnf \inR_{\tau_1+\tau_2}\,E \bnf \matchwith{E}{e_1}{e_2}
+\)
+The \inL\ and \inR\ constructs are called _left injection_ and _right injection_, respectively.
+
+Evaluation rules:
+\begin{align*}
+\matchwith{(\inL_{\tau_1+\tau_2}~v)}{e_1}{e_2}\ &\to\ e_1\,v
+&
+\matchwith{(\inR_{\tau_1+\tau_2}~v)}{e_1}{e_2}\ &\to\ e_2\,v
+\end{align*}
+Here $e_1$ and $e_2$ are functions and must have the same codomain type in order for the whole "match"
+expression to have a type. This formulation allows us to have heterogeneous sums. Note also that the evaluation
+of $e_1$ and $e_2$ are lazy: only one of them will be evaluated, and only after the choice has been made.
+
+Typing rules:
+\begin{align*}
+\Rule{\Gjudge e{\tau_1}}{\Gjudge{\inL_{\tau_1+\tau_2}~e}{\tau_1+\tau_2}}
+&&
+\Rule{\Gjudge e{\tau_2}}{\Gjudge{\inR_{\tau_1+\tau_2}~e}{\tau_1+\tau_2}}
+&&
+\Rule{\Gjudge{e_0}{\tau_1+\tau_2} \quad \Gjudge{e_1}{\tau_1\to\tau_3} \quad \Gjudge{e_2}{\tau_2\to\tau_3}}
+{\Gjudge{\matchwith{e_0}{e_1}{e_2}}{\tau_3}}
+\end{align*}
+
+To give an example of the sum type, consider the sum of two
+"unit" types, $"unit + unit"$. This type has exactly two elements,
+namely \inL~"null" and \inR~"null". We could take this as a
+definition of the type "bool" with elements $"true"\definedas\inL~"null"$
+and $"false"\definedas\inR~"null"$. The lazy conditional statement
+$\ifthenelse b{e_1}{e_2}$ could then be written as
+$\matchwith b{\lam{z}{e_1}}{\lam{z}{e_2}}$.
+
+OCaml has a construct that is a generalization of the sum type. The OCaml syntax is
+\begin{center}
+\verb+type t = C1 of t1 | ... | Cn of tn | D1 | ... | Dm+.
+\end{center}
+Such datatypes are also called _variants_. The \verb|Ci| and \verb|Di| are
+\emph{constructors}, and must be globally (across all types) unique to
+avoid confusion as to which type a particular constructor
+refers to (in our sum type, the ambiguity is resolved by decorating \inL\ and \inR\ with subscripts $\tau_1+\tau_2$).
+
+\section{Denotational Semantics}
+
+We now give the denotational semantics for type domains of
+$\lambda^{\to + *}$, the strongly-typed $\lambda$-calculus
+with sum and product types.
+\(
+\SB[T]{\tau \to \tau'} &\definedas& \SB[T]{\tau} \to \SB[T]{\tau'}\\
+\SB[T]{\tau * \tau'} &\definedas& \SB[T]{\tau} \times \SB[T]{\tau'}\\
+\SB[T]{\tau + \tau'} &\definedas& \SB[T]{\tau} + \SB[T]{\tau'}
+\)
+As before, our contract for this language is:
+\(
+\rho\models\Gamma\ \wedge\ \Gjudge e\tau &\Rightarrow& \Cgr e\ \in\ \SB[T]{\tau}.
+\)
+The remaining semantic rules are:
+\(
+\Cgr{(e_1, e_2)} &\definedas& {\config{\Cgr{e_1}}{\Cgr{e_2}}}\\
+\Cgr{"\#1"~e} &\definedas& \proj 1(\Cgr{e})\\
+\Cgr{"\#2"~e} &\definedas& \proj 2(\Cgr{e})\\
+\Cgr{\inL_{\tau_1 + \tau_2}~e} &\definedas& \inj 1(\Cgr{e})\\
+\Cgr{\inR_{\tau_1 + \tau_2}~e} &\definedas& \inj 2(\Cgr{e})\\
+\Cgr{\matchwith{e_0}{e_1}{e_2}} &\definedas& \begin{cases}
+(\Cgr{e_1})\,v, & \text{if } \Cgr{e_0}=\inj 1\,v,\\
+(\Cgr{e_2})\,v, & \text{if } \Cgr{e_0}=\inj 2\,v
+\end{cases}\\
+&=& \metamatchwith{\Cgr{e_0}}{\inj 1\,v \to (\Cgr{e_1})\,v}{\inj 2\,v\to (\Cgr{e_2})\,v},
+\)
+where $\proj n$ is the (mathematical) projection operator that
+selects the $n$th element of a product and $\inj n$ is the injection
+operator that injects an element into a coproduct. These meta-operations
+are also well-typed, but we omit the annotations:
+\begin{align*}
+\proj i &: \SB[T]{\tau_1}\times\SB[T]{\tau_2}\ \to\ \SB[T]{\tau_i}
+&
+\inj i &: \SB[T]{\tau_i}\ \to\ \SB[T]{\tau_1}+\SB[T]{\tau_2}
+\end{align*}
+for $i\in\{1,2\}$.
+
+\section{Adding Recursion}
+
+So far this language is not Turing-complete, because there is no way to do unbounded recursion. This is true because there is no possibility of nontermination. The easiest way to add this capability to the language is to add support for recursive functions.
+
+To do this, we first extend the definition of an expression:
+\(
+e &::=& \cdots \bnf \rec{\type f{\sigma\to\tau}}{\type x\sigma}{e}
+\)
+The new keyword "rec" defines a recursive function named
+$f$ such that both $x$ and $f$ are in scope inside $e$.
+Intuitively, the meaning of $\rec{\type f{\sigma\to\tau}}{\type x\sigma}{e}$
+is the least fixed point of the map $f\mapsto \lam{\type x\sigma}e$, where both
+$f$ and $\lam{\type x\sigma}e$ are of type $\sigma\to\tau$.
+
+For example, we would write the recursive function
+\(
+f(x) &=& \ifthenelse{x\gt 0}{1}{f(x + 1)}
+\)
+as
+\(
+\rec{\type f{"int"\to"int"}}{\type x{"int"}}{\ifthenelse{x\gt 0}{1}{f(x+1)}}.
+\)
+
+The small-step operational semantics evaluation rule for "rec" is:
+\(
+\rec{\type f{\sigma\to\tau}}{\type x\sigma}{e}\ &\to&\ \lam{\type x\sigma}{\subst e{(\rec{\type f{\sigma\to\tau}}{\type x\sigma}{e})}f}
+\)
+and the typing rule for "rec" is
+\[
+\Rule
+{\judge{\Gamma,\,\type f{\sigma\to\tau},\,\type x\sigma}{e}{\tau}}
+{\Gjudge{(\rec{\type f{\sigma\to\tau}}{\type x\sigma}{e})}{\sigma\to\tau}}.
+\]
+The denotational semantics is defined in terms of the "fix" operator on domains:
+\(
+\Cgr{\rec{\type f{\sigma\to\tau}}{\type x\sigma}{e}}
+&\definedas&
+"fix"~\lam{g\in\SB[T]{\sigma\to\tau}}
+{\lam{v\in\SB[T]\sigma}{\SBB[C]{e}{\Gamma[(\sigma\to\tau)/f,\,\sigma/x]}{\rho[v/x,\,g/f]}}}
+\)
+Of course, whenever we take a fixed point, we have to make sure that
+a fixed point exists. We know that the function satisfies continuity
+and monotonicity because we are writing in the metalanguage. However,
+for a fixed point to exist, $\SB[T]{\sigma\to\tau}$ must be
+a pointed CPO. But for this to be true, we have to make sure $\bot$ is
+in the codomain of the function. We therefore redefine
+\begin{align*}
+\SB[T]{"int"}\ &\definedas\ \integers_\bot
+&
+\SB[T]{"bool"}\ &\definedas\ \Two_\bot
+&
+\SB[T]{"unit"}\ &\definedas\ \{"null"\}_\bot
+%&
+%\SB[T]{\sigma\to\tau}\ &\definedas\ \SB[T]{\sigma}_\bot\to\SB[T]{\tau}_\bot.
+\end{align*}
+and define the functions and product domains $\SB[T]{\sigma\to\tau}$ and $\SB[T]{\sigma*\tau}$ inductively as before,
+which will now be pointed CPOs.
+
+In the disjoint sum (coproduct) domain construction shown in class,
+we tagged the elements of the two domains and took the union. This
+resulted in a non-pointed CPO, even if the two domains were pointed
+CPOs, so we must add a new bottom element $\bot$. But
+this construction is quite unsatisfactory, since iterating it
+leads to the proliferation of useless bottoms.
+Instead, we use the following alternative construction.
+Given pointed CPOs $D$ and $E$, form the domain consisting of the set
+\[
+\set{\inj 1(d)}{d\in D \wedge d\neq \bot_D}\ \cup\ \set{\inj 2(e)}{e\in E \wedge e\neq \bot_E}\ \cup\ \{\bot\},
+\]
+where $\bot$ is a new element, ordered by
+\(
+x\sqsubseteq y &\stackrel\triangle\Longleftrightarrow& x = \bot\ \vee\
+(x=\inj 1(d) \wedge y=\inj 1(d') \wedge d \sqsubseteq_D d')\ \vee\
+(x=\inj 2(e) \wedge y=\inj 2(e') \wedge e \sqsubseteq_E e').
+\)
+This is called the _smash sum_ of $D$ and $E$.
+
+We also have to change our contract to account for the possibility of nontermination:
+\(
+\rho\models\Gamma\ \wedge\ \Gjudge e\tau &\Rightarrow& \Cgr{e} \in \SB[T]\tau_\bot.
+\)
+
+Finally, we have to lift our semantics to take nontermination into account.
+For example, we should change the denotation of a pair to:
+\(
+\Cgr{(e_1, e_2)} &\definedas&
+\begin{cases}
+{\config{\Cgr{e_1}}{\Cgr{e_2}}}, & \mbox{if both $\Cgr{e_1}\neq\bot$ and $\Cgr{e_2}\neq\bot$,}\\
+\bot, & \mbox{otherwise.}
+\end{cases}
+\)
+We can write this conveniently using our metalanguage \nm{let} construct:
+\(
+\Cgr{(e_1, e_2)} &\definedas&
+\metaletin{v_1\in\SB[T]{\tau_1}}{\Cgr{e_1}} \\&&
+\metaletin{v_2\in\SB[T]{\tau_2}}{\Cgr{e_2}} \\&&
+\lift{\config{v_1}{v_2}},
+\)
+where $\Gjudge{(e_1, e_2)}{\tau_1*\tau_2}$. Recall that mathematical \nm{let} is defined as:
+\(
+\metaletin{x\in D}{e_1}{e_2} &\definedas& (\lm{x}{D}{e_2})\star\,e_1.
+\)

@@ -1,0 +1,218 @@
+\lecture{20}
+\title{Soundness of the Typing Rules}
+\date{8 April 2016}
+\maketitle
+
+\section{Soundness from the Operational Perspective}
+
+We have seen that we can write useful typing rules, but how do we know we got them right?
+This depends on what the type system is meant to accomplish.
+The traditional application is avoiding runtime type errors.
+We say that a type system is _sound_ if well-typed programs do not incur
+runtime type errors; that is, they do not get stuck when evaluated
+according to the operational semantics:
+\begin{center}
+\emph{The typing rules are sound} $\Iffdef$ \emph{no well-typed program gets stuck.}
+\end{center}
+
+To be more precise, let us call $e$ _irreducible_ and write \Irred e\
+if there is no reduction possible on $e$. All values of $\lambda^\to$
+are irreducible. If $e$ is irreducible but is not a value, then $e$ is
+said to be _stuck_. We wish to show
+\begin{theorem}[Operational Soundness]
+\label{lem:operationalsoundness}\
+If $\judge{}e\tau$ and $e \stackrel*\to e'$ and $\Irred{e'}$, then $e'\in\Val$ and $\judge{}{e'}\tau$.
+\end{theorem}
+We will prove this in two steps using the following two lemmas:
+\begin{lemma}[Type Preservation]
+\label{lem:typepreservation}\
+If $\Gjudge e\tau$ and $e \to e'$, then $\Gjudge{e'}\tau$.
+\end{lemma}
+\begin{lemma}[Progress]
+\label{lem:progress}\
+If $\judge{}e\tau$ and $\Irred e$, then $e\in\Val$.
+\end{lemma}
+The type preservation lemma (Lemma \ref{lem:typepreservation}) says that as we evaluate a program, its type is preserved at each step. The progress lemma (Lemma \ref{lem:progress}) says that every program is either a value or can be stepped to another program (and by type preservation, this will be of the same type).
+
+Operational soundness follows easily from these two lemmas. Type preservation
+says every step preserves the type, so we use
+induction on the number of steps taken in $e \stackrel*\to e'$ to show
+that $e'$ must have the same type as $e$. Then progress can
+be applied to $e'$ to show that the evaluation is not stuck there.
+We will now set out to prove these two lemmas.
+
+\section{Proof of the Type Preservation Lemma}
+
+Assuming that $\Gjudge e\tau$ and $e\to e'$, we wish to show that $\Gjudge{e'}\tau$.
+We will do this by induction on the small-step operational semantics rules.
+
+If $e\to e'$, there are three cases corresponding to the three evaluation rules:
+\[
+\begin{array}{c@{\hspace{1cm}}c@{\hspace{1cm}}c}
+\infer[\mbox{(L)}]{e_0\,e_1 \to e'_0\,e_1}{e_0 \to e'_0} &
+\infer[\mbox{(R)}]{v\,e \to v\,e'}{e \to e'} &
+\infer[(\beta)]{(\lam{\type x\sigma}{e})\,v \to \subst evx}{}
+\end{array}
+\]
+
+\begin{itemize}
+\item Case (L): $e_0\,e_1 \to e'_0\,e_1$.
+
+Because we have a typing derivation for $e_0\,e_1$, we know
+that there are typing derivations for $e_0$ and $e_1$ too. We must
+have $\Gjudge{e_0}{\sigma\to\tau}$ and $\Gjudge{e_1}\sigma$
+for some type $\sigma$. By the induction hypothesis,
+the reduction $e_0 \to e_0'$ also preserves type, so
+$\Gjudge{e_0'}{\sigma\to\tau}$. Applying the typing rule for
+applications, we have that $\Gjudge{e_0'\,e_1}\tau$.
+
+\item Case (R): $v\,e \to v\,e'$.
+
+This case is symmetrical to case (L). In this case it is the right-hand
+subexpression making the step.
+
+\item Case ($\beta$): $(\lam{\type x\sigma}{e})\,v \to \subst evx$.
+
+The typing derivation of $\Gjudge{(\lam{\type x\sigma}{e})\,v}\tau$ must look like this:
+
+\[
+  \infer{
+     \Gjudge{(\lam{\type x\sigma}{e})\,v}\tau
+     }
+     {
+     \infer {
+        \Gjudge{(\lam{\type x\sigma}{e})}{\sigma\to\tau}
+        }
+        {
+        \Gamma,\,\type x\sigma\judge{}{e}\tau
+        }
+     &
+     \Gjudge v\sigma
+     }
+\]
+
+We want to show that $\Gjudge{\subst evx}\tau$ using the facts
+$\judge{\Gamma,\,\type x\sigma}e\tau$ and $\judge{}v\sigma$.
+Our induction hypothesis does not help us here; we need to
+prove this separately. It follows as a special case of the
+substitution lemma below, which captures the type
+preservation of $\beta$-reduction.
+\end{itemize}
+
+\section{The Substitution Lemma}
+
+\begin{lemma}[Substitution Lemma]\
+$\judge{}v\sigma\ \Rightarrow\ (\Gamma,\,\type x\sigma\judge{}e\tau\ \Leftrightarrow\ \Gjudge{\subst evx}\tau)$.
+\end{lemma}
+We will prove this by structural induction on $e$.
+
+\paragraph{Case 1} $x\notin\FV e$.
+
+This case covers the base cases $e\in\{n, "true", "false", "null"\}$ and $e = y\neq x$ and $\lambda$-abstractions $\lam{\type x\rho}e$ that bind $x$. In this case the substitution has no effect and any binding of $x$ in the type environment $\Gamma$ is irrelevant, thus the lemma reduces to the trivial statement
+\begin{align*}
+\judge{}v\sigma\ &\Rightarrow\ (\Gjudge e\tau\ \Leftrightarrow\ \Gjudge e\tau).
+\end{align*}
+
+\paragraph{Case 2} $e = x$.
+
+In this case the lemma reduces to
+\begin{align*}
+\judge{}v\sigma\ &\Rightarrow\ (\Gamma,\,\type x\sigma\judge{}x\tau\ \Leftrightarrow\ \Gjudge v\tau),
+\end{align*}
+since $\subst xvx=v$. Since $v$ is closed, the type environment $\Gamma$ is irrelevant, so the statement further reduces to
+\begin{align*}
+\judge{}v\sigma\ &\Rightarrow\ (\type x\sigma\judge{}x\tau\ \Leftrightarrow\ \judge{}v\tau).
+\end{align*}
+Since types are unique, both sides of the double implication say that $\sigma=\tau$, so again the lemma reduces to a tautology.
+
+\paragraph{Case 3} $e = e_0\,e_1$.
+
+Suppose $\judge{}v\sigma$.
+\reasoning{\exists\sigma\ \Gjudge{\subst{e_0}vx}\sigma\to\tau\ \wedge\ \Gjudge{\subst{e_1}vx}\sigma}
+\begin{align*}
+\Gamma,\,\type x\sigma\judge{}{e_0\,e_1}\tau\
+&\Leftrightarrow\ \reason{\exists\rho\ \Gamma,\,\type x\sigma\judge{}{e_0}\rho\to\tau\ \wedge\ \Gamma,\,\type x\sigma\judge{}{e_1}\rho}{typing rule for applications}\\
+&\Leftrightarrow\ \reason{\exists\rho\ \Gjudge{\subst{e_0}vx}\rho\to\tau\ \wedge\ \Gjudge{\subst{e_1}vx}\rho}{induction hypothesis}\\
+&\Leftrightarrow\ \reason{\Gjudge{(\subst{e_0}vx)\,(\subst{e_1}vx)}\tau}{typing rule for applications}\\
+&\Leftrightarrow\ \reason{\Gjudge{\subst{(e_0\,e_1)}vx}\tau}{definition of substitution.}
+\end{align*}
+
+\paragraph{Case 4} $e = \lam{\type y\rho}{e'}$, where $y\neq x$ (the case $y=x$ was covered in Case 1).
+
+Suppose $\judge{}v\sigma$. The type of $\lam{\type y\rho}{e'}$, if it exists, must be $\rho\to\tau$ for some $\tau$. Similarly, the type of $\subst{(\lam{\type y\rho}{e'})}vx=\lam{\type y\rho}{(\subst{e'}vx)}$, if it exists, must be $\rho\to\tau'$ for some $\tau'$.
+\reasoning{\Gjudge{\subst{(\lam{\type y\rho}{e'})}vx}{\rho\to\tau}}
+\begin{align*}
+\judge{\Gamma,\,\type x\sigma}{(\lam{\type y\rho}{e'})}{\rho\to\tau}\
+&\Leftrightarrow\ \reason{\judge{\Gamma,\,\type x\sigma,\,\type y\rho}{e'}\tau}{typing rule for abstractions}\\
+&\Leftrightarrow\ \reason{\judge{\Gamma,\,\type y\rho,\,\type x\sigma}{e'}\tau}{exchange}\\
+&\Leftrightarrow\ \reason{\judge{\Gamma,\,\type y\rho}{\subst{e'}vx}\tau}{induction hypothesis}\\
+&\Leftrightarrow\ \reason{\Gjudge{\lam{\type y\rho}{(\subst{e'}vx)}}{\rho\to\tau}}{typing rule for abstractions}\\
+&\Leftrightarrow\ \reason{\Gjudge{\subst{(\lam{\type y\rho}{e'})}vx}{\rho\to\tau}}{definition of substitution.}
+\end{align*}
+
+\section{Proof of the Progress Lemma}
+
+To finish the proof of soundness, it remains to prove the progress lemma. Recall that this lemma states
+\begin{align*}
+\judge{}e\tau\ \wedge\ \Irred e\ &\Rightarrow\ e\in\Val,
+\end{align*}
+or equivalently,
+\begin{align*}
+\judge{}e\tau\ \wedge\ e\notin\Val\ &\Rightarrow\ \exists e'\ e\to e'.
+\end{align*}
+In other words, we cannot get stuck when evaluating a well-typed expression.
+
+We prove the progress lemma using structural induction on $e$.
+Recall the definition of a term in $\lambda^\to$:
+\begin{align*}
+e\ &::=\ b \bnf x \bnf \lam{\type x\tau}e \bnf e_0\,e_1,
+\end{align*}
+where $b$ denotes a constant. This gives four cases:
+
+\paragraph{Case 1} $e=b$.
+
+Since $b\in\Val$, we are done.
+
+\paragraph{Case 2} $e=x$.
+
+This case is impossible, because we cannot assign a type to $x$ if the type environment is empty.
+
+\paragraph{Case 3} $e=\lam{\type x\sigma}{e'}$.
+
+This case requires another lemma:
+\begin{lemma}
+If $\Gjudge e\tau$ then $\FV e\subseteq\dom\Gamma$.
+\end{lemma}
+We leave the proof as an exercise. Since $\judge{}e\tau$, it follows that $e$ is closed, therefore is a value.
+
+\paragraph{Case 4} $e=e_0\,e_1$.
+
+We cannot have a value of this form, so the statement of the lemma reduces to
+\begin{align*}
+\judge{}{(e_0\,e_1)}\tau\ &\Rightarrow\ \exists e'\ (e_0\,e_1)\to e'.
+\end{align*}
+In any type derivation of $\judge{}{(e_0\,e_1)}\tau$, the last step must have the form
+\[
+\infer{\judge{}{(e_0\,e_1)}\tau}{\judge{}{e_0}{\sigma\to\tau} & \judge{}{e_1}\sigma}
+\]
+for some type $\sigma$. By the induction hypothesis, either $e_0\in\Val$ or $\exists e_0'\ e_0\to e_0'$, and either $e_1\in\Val$ or $\exists e_1'\ e_1\to e_1'$. This gives three possibilities:
+\begin{itemize}
+\item If $e_0$ is not a value, then by the induction hypothesis there $\exists e_0'\ e_0\to e_0'$, therefore
+\[
+\infer{e_0\,e_1\to e_0'\,e_1}{e_0\to e_0'},
+\]
+so $e=e_0\,e_1$ can be further reduced.
+
+\item If $e_0$ is a value $v$ but $e_1$ is not a value, then by the induction hypothesis $\exists e_1'\ e_1\to e_1'$, and we have
+\[
+\infer{v\,e_1\to v\,e_1'}{e_1\to e_1'},
+\]
+so $e=v\,e_1$ can be further reduced.
+\item
+If both $e_0$ and $e_1$ are values, then since $e_0$ is a value with an arrow type $\sigma\to\tau$, it has to be an abstraction, say $e_0=\lam{\type x\sigma}{e'}$, and $e_1$ is some value $v$ of type $\sigma$. Then
+\begin{align*}
+e\ &=\ (\lam{\type x\sigma}{e'})\,v \to \subst{e'}vx,
+\end{align*}
+so $e$ can be further reduced.
+\end{itemize}
+This completes the proof.

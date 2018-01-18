@@ -1,0 +1,117 @@
+\lecture{5}
+\title{Recursion and Fixed-Point Combinators}
+\date{8 February 2016}
+\maketitle
+
+\section{Fixed Points}
+
+With an encoding for \IF, we have some control over the flow of a program. We can also write simple \texttt{for} loops using the Church numerals $\overline n$. However, we do not yet have the ability to write an unbounded \WHILE\ loop or a recursive function.
+
+In OCaml, we can write the factorial function recursively as
+\begin{center}
+"let rec fact n = if n $\le$ 1 then 1 else n * fact (n - 1)"
+\end{center}
+But how can we write this in the $\lambda$-calculus, in which all functions are anonymous? We must somehow construct a $\lambda$-term \FACT\ that satisfies the equation
+\begin{eqnarray}
+\FACT &=& \lam{n}{\IF\,(\LEQ\,n\,\overline 1)\,\overline 1\,(\MUL\,n\,(\FACT\,(\SUB\,n\,\overline 1)))}.\label{eqn:fact}
+\end{eqnarray}
+Equivalently, we must construct a \emph{fixed point} of the map $T$ defined by
+\begin{eqnarray*}
+T &\definedas& \lam{f}{\lam{n}{\IF\,(\LEQ\,n\,\overline 1)\,\overline 1\,(\MUL\,n\,(f\,(\SUB\,n\,\overline 1)))}};
+\end{eqnarray*}
+that is, a $\lambda$-term \FACT\ such that $T\,\FACT=\FACT$.
+Any fixed point of $T$ will do; different fixed points may disagree on non-integers, but one can show inductively that any
+fixed point of $T$ is a solution of (\ref{eqn:fact}) and will yield $\overline{n!}$ on input $\overline n$.
+
+Note that applying $T$ is like ``unwinding'' the definition of \FACT\ once.
+If we think of $f$ as an approximation to \FACT, then $Tf$ is a better approximation in the
+sense that if $f$ agrees with \FACT\ on inputs $\overline 0,\overline 1,\ldots,\overline n$, then
+$Tf$ agrees with \FACT\ on inputs $\overline 0,\overline 1,\ldots,\overline n,\overline{n+1}$. Thus
+we can start with any function $f$ whatsoever, and no matter what $f$ is,
+$T^nf$ will agree with \FACT\ on $\overline 0,\overline 1,\ldots,\overline{n-1}$.
+
+But this is not good enough to construct \FACT\ from scratch. All we will ever get this way are
+better and better finite approximations, but we will never achieve \FACT\ itself.
+So how can we ever hope to construct a fixed point of $T$?
+
+\section{Recursion via Self-Application}
+\label{sec:self-app}
+
+The key observation is that, although we do not have \FACT\ itself, we do have something very similar, namely the function $T$. Thus we might try applying $T$ to itself. The only problem is that $T$ takes an extra argument $f$, so this would only make sense if in the body of $T$ we applied $f$ to something. Well, we want to apply $T$ to $T$, so let's apply $f$ to $f$ in the body and see what we get. Call this new version $T'$.
+\begin{eqnarray*}
+T' &\definedas& \lam f{\lam n{\IF\,(\LEQ\,n\,\overline 1)\,\overline 1\,(\MUL\,n\,((\ff)\,(\SUB\,n\,\overline 1)))}}
+\end{eqnarray*}
+Now if we apply $T'$ to itself, we get
+\begin{eqnarray*}
+T'T' &\stepsone& \lam n{\IF\,(\LEQ\,n\,\overline 1)\,\overline 1\,(\MUL\,n\,((T'T')\,(\SUB\,n\,\overline 1)))}.
+\end{eqnarray*}
+It is a fixed point of $T$! Moreover, we can even see that it works as a definition of \FACT:
+\[\begin{array}{rcll} 
+(T'T')\,\overline 4 &\to& (\lam{n}{\IF\,(\LEQ\,n\,\overline 1)\,\overline 1\,(\MUL\,n\,((T'T')\,(\SUB\,n\,\overline 1)))})\,\overline 4\\
+&\to& \IF\,(\LEQ\,\overline 4\,\overline 1)\,\overline 1\,(\MUL\,\overline 4\,((T'T')\,(\SUB\,\overline 4\,\overline 1)))\\
+&\to& \MUL\,\overline 4\,((T'T')\,(\SUB\,\overline 4\,\overline 1))\\
+&\to& \MUL\,\overline 4\,((T'T')\,\overline 3)\\
+&\vdots\\
+&\to& \MUL\,\overline 4\,(\MUL\,\overline 3\,(\MUL\,\overline 2\,((T'T')\,\overline 1))\\
+&\to& \MUL\,\overline 4\,(\MUL\,\overline 3\,(\MUL\,\overline 2\,\overline 1)\\
+&\to& \bar{4!}.
+\end{array}\]
+
+\section{The $Y$ Combinator}
+
+What just happened? We had an operator $T$ describing the factorial function recursively, and wanted a fixed point of $T$. We constructed a new term
+\(
+T' &\definedas& \lam f{T\,(\ff)},
+\)
+then we applied $T'$ to itself:
+\begin{align*}
+T'T'\ &=\ (\lam f{T\,(\ff)})\,(\lam f{T\,(\ff)}).
+\end{align*}
+This is a fixed point of $T$, since in one step
+\begin{eqnarray}
+(\lam f{T\,(\ff)})\,(\lam f{T\,(\ff)}) &\stepsone& T\,((\lam f{T\,(\ff)})\,(\lam f{T\,(\ff)})).\label{eq:badcbv}
+\end{eqnarray}
+Moreover, this construction does not depend on the nature of $T$. Thus if we define
+\begin{eqnarray*}
+Y &\definedas& \lam t{(\lam f{t(\ff)})\,(\lam f{t(\ff)})},
+\end{eqnarray*}
+then for any $T$, we have that $YT$ is a fixed point of $T$; that is, $YT=T(YT)$.
+
+This $Y$ is the infamous \emph{fixed-point combinator}, a closed $\lambda$-term that constructs solutions to recursive equations in a uniform way.
+
+Curiously, although \emph{every} $\lambda$-term is a fixed point of the identity map $\lam xx$, the $Y$ combinator produces a particularly unfortunate one, namely the divergent $\lambda$-term $\Omega$ introduced in Lecture 2.
+
+\section{Other Fixed-Point Combinators}
+
+\subsection{A CBV Fixed-Point Combinator}
+
+The fixed-point combinator $Y$ works perfectly well with call-by-name (CBN) evaluation, but
+with call-by-value (CBV), it produces divergent functions.
+The problem is that the self-application $T'T'$ can diverge.
+Note that the reduction sequence beginning with \eqref{eq:badcbv} would not terminate under CBV.
+When the $Y$ combinator is used with the CBV reduction strategy,
+it tries to fully unroll the recursive function definition before applying the function, leading to divergence.
+
+The CBV divergence problem can be fixed by wrapping the self-application $\ff$ in another lambda abstraction: $\lam z{\ff z}$.
+This term yields the same result as $\ff$ when applied to any argument, but it is a value,
+therefore will only be evaluated when it is applied.
+The effect of wrapping the term is to delay evaluation as long as
+possible, simulating what would have happened in CBN evaluation.
+
+The CBV fixed-point combinator is:
+\begin{align*}
+Y_{\text{CBV}}\ &\definedas\ \lam t{(\lam f{t(\lam z{\ff z})})\,(\lam f{t(\lam z{\ff z})})}
+\end{align*}
+
+\subsection{Kleene's Fixed-Point Combinator}
+
+Since $YF$ is a fixed point of $F$,
+we have a solution to the equation $YF = F(YF)$. This construction works for any $F$.
+Therefore the equation $Y = \lam f{f(Yf)}$ constitutes another recursive function
+definition. Directly applying the same self-application trick of
+\S\ref{sec:self-app} to this function definition, we obtain another fixed-point combinator:
+%a fixed-point combinator discovered by Alan Turing (1912--1954):
+\begin{align*}
+\Theta\ &\definedas\ (\lam{yf}{f(yyf)})\,(\lam{yf}{f(yyf)}).
+\end{align*}
+In fact, there are infinitely many fixed-point combinators!

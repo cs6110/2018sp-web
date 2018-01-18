@@ -1,0 +1,309 @@
+\lecture{2}
+\title{The $\lambda$-Calculus}
+\date{29 January 2016}
+\maketitle
+
+Last time we introduced the \emph{$\lambda$-calculus},
+a mathematical system for studying the interaction of
+_functional abstraction_ and _functional application_.
+
+We discussed the syntax and some conventions regarding parsing and gave several
+examples. Now we arrive at the question: How does one _evaluate_ a $\lambda$-calculus term?
+This is analogous to running a program in a functional language.
+
+The traditional evaluation mechanism of the $\lambda$-calculus is based on the notion
+of _substitution_. The main computational rule is called _$\beta$-reduction_. This rule applies
+whenever there is a subterm of the form $(\lam x{e_1})\,e_2$ representing the
+application of a function $\lam x{e_1}$ to an argument $e_2$. The $\beta$-reduction
+rule substitutes $e_2$ for the variable $x$ in the body of $e_1$, then recursively
+evaluates the resulting expression.
+
+We must be very careful about the formal definitions, however,
+because trouble can arise if we just substitute terms for variables blindly.
+
+\section{Scope, Bound and Free Occurrences, Closed Terms}
+
+The _scope_ of the abstraction operator $\lambda x$ shown in the term $\lam xe$ is its _body_ $e$. An occurrence of a variable $y$ in a term is said to be _bound_ in that term if it occurs in the scope of an abstraction operator $\lambda y$ (with the same variable $y$); otherwise, it is _free_. A bound occurrence of $y$ is _bound to_ the abstraction operator $\lambda y$ with the smallest scope in which it occurs.
+
+\begin{wrapfigure}[6]{r}{50mm}
+ % \begin{center}
+  \begin{tikzpicture}[->, >=stealth', auto, thick,
+   place/.style={circle,fill,inner sep=2pt},
+   white/.style={circle,inner sep=2pt},
+   shortloop/.style={to path={.. controls +(100:.5) and +(80:.5) .. (\tikztotarget) \tikztonodes}}]
+   \node (0) at (0,0) {$\lam{x}{(x\,(\lam{y}{y\,a})\,x)\,(\lam x x\,y)}$};
+   \node (1) at (-1.7,0) [white] {};
+   \node (2) at (-1.17,0) [white] {}
+    edge [shortloop] (1);
+   \node (3) at (-0.57,0) {};
+   \node (4) at (-0.21,0) {}
+    edge [shortloop] (3);
+   \node (5) at (0,0) [white] {};
+   \node (6) at (0.4,0) [white] {}
+    %edge [to path={.. controls +(100:.5) and +(80:.5) .. (\tikztotarget) \tikztonodes}] (1);
+    edge [->,bend right=80] (1);
+   \node (7) at (1.15,0) [white] {};
+   \node (8) at (1.51,0) [white] {}
+    %edge [->,bend right=60,in=210] (7);
+    edge [shortloop] (7);
+   \node (9) at (1.77,0) [white] {};
+   \node (left) at (-2.4,0) {};
+  \end{tikzpicture}
+ %\end{center}
+ \caption{Scope and bindings}
+ \label{fig:bindings}
+\end{wrapfigure}
+Note that a variable can have both bound and free occurrences in the same term, and can have bound occurrences that are bound to different abstraction operators.
+
+For example, in the term shown in Fig.~\ref{fig:bindings},
+all three occurrences of $x$ are bound. The first two are bound to the first $\lambda x$, and the last is bound to the second $\lambda x$. The first occurrence of $y$ is bound, the $a$ is free, and the last $y$ is free, since it is
+not in the scope of any $\lambda y$.
+
+This scoping discipline is called _lexical_ or _static scoping_. It is called so
+because the variable's scope is defined by the text of the program, and it is
+possible to determine its scope before the program runs by inspecting the
+program text.
+
+\subsection{Free Variables}
+
+Formally, the set of _free variables_ of a term, denoted $\FV e$, is defined inductively as follows:
+\begin{align*}
+\FV x &\definedas \{x\} & \FV{e_0\,e_1} &\definedas \FV{e_0} \cup \FV{e_1} & \FV{\lam xe} &\definedas \FV{e} - \{x\}.
+\end{align*}
+This definition is inductive on the structure of $e$. The basis is the leftmost
+equation, and the other two are the inductive cases. In each of the two inductive cases,
+the right-hand side defines the value of $\FV{e}$ in terms of
+proper subterms of $e$, which are smaller.
+Since all terms have finite size, this means that the
+definition eventually reaches the base case of variables. This is an example
+of _structural induction_. We will see many more definitions by structural induction in this course.
+
+A term is _closed_ if it contains no free variables; thus all occurrences of
+any variable $x$ occur in the scope of a binding operator $\lambda x$.
+A term is _open_ if it is not closed.
+
+\section{Substitution and $\beta$-Reduction}
+
+\subsection{Variable Capture}
+
+Intuitively, to perform $\beta$-reduction on the term $(\lam x{e_1})\,e_2$, we substitute the argument $e_2$ for all free occurrences of the formal parameter $x$ in the body $e_1$, then evaluate the resulting expression (which may involve further such steps).
+
+However, we cannot just substitute $e_2$ blindly for $x$ in $e_1$ because of the problem of _variable capture_.
+This would occur if $e_2$ contained a free occurrence of a variable $y$, and there were a free occurrence of $x$
+in the scope of a $\lambda y$ in $e_1$. In that case, the free occurrence of $y$ in $e_2$ would be
+``captured'' by that $\lambda y$ and would end up bound to it after the substitution, which would
+incorrectly alter the semantics.
+
+For example, consider the substitution of $x$ for $y$ in $\lam x{xy}$.
+Raw substitution would yield $\lam x{xx}$.
+The variable $x$ has been \emph{captured} by the binding operator $\lambda x$.
+
+To prevent this, we can rename the bound variable $x$ to $z$ to obtain
+$\lam z{zy}$ before doing the substitution. This transformation does not
+change the semantics. Now substituting $x$ for $y$ yields $\lam z{zx}$; the
+variable has not been captured.
+
+\subsection{Safe Substitution}
+
+This idea leads to the following formal definition of _safe substitution_.
+The definition is by structural induction.
+We write $\subst{e_1}{e_2}x$ to denote the result of substituting
+$e_2$ for all free occurrences of $x$ in $e_1$ according to the following rules.\footnote{There is no standard notation for substitution.
+Pierce \cite{Pierce02} writes $[x \mapsto e_2]e_1$. Other notations for the same idea
+are encountered frequently, including $e_1[x\mapsto e_2]$, $e_1[x \leftarrow e_2]$, $e_1[x/e_2]$, $e_1[e_2/x]$, and
+$e_1[x := e_2]$. Because we will be using brackets for other purposes,
+we will use the notation $\subst{e_1}{e_2}{x}$.}
+\[
+\begin{array}{rcll}
+\subst xex &\definedas& e\\
+\subst yex &\definedas& y & \mbox{where $y\neq x$}\\
+\subst{(e_1\,e_2)}ex &\definedas& (\subst{e_1}ex)\,(\subst{e_2}ex)\\
+\subst{(\lam x{e_0})}{e}x &\definedas& \lam x{e_0}\\
+\subst{(\lam y{e_0})}{e}x &\definedas& \lam y{(\subst{e_0}{e}x)} & \mbox{where $y\neq x$ and $y\not\in\FV{e}$}\\
+\subst{(\lam y{e_0})}{e}x &\definedas& \lam z{(\subst{\subst{e_0}zy}{e}x)} & \mbox{where $y\neq x$, $z\neq x$, $z\not\in\FV{e_0}$, and $z\not\in\FV{e}$}.
+\end{array}
+\]
+Note that the rules are applied inductively. That is, the result of a
+substitution in a compound term is defined in terms of substitutions
+on its subterms.
+
+The last of the six rules applies when
+$y\in\FV{e}$. In this case, we rename the bound variable $y$ to
+$z$ to avoid capture of the free occurrence of $y$.
+One might well ask: but what if $y$ occurs free in the scope of a $\lambda z$ in $e_0$?
+Wouldn't the $z$ then be captured? The answer is that it will be taken
+care of in the same way, but inductively on a smaller term.
+
+Despite the importance of substitution, it was not until the mid-1950's
+that a completely satisfactory definition of substitution was given by
+Haskell Curry. Previous mathematicians, from Newton to Hilbert to
+Church, worked with incomplete or incorrect definitions. It is the
+last of the rules above that is the hardest to get right, because it is easy
+to forget one of the three restrictions on the choice of $z$ or to
+falsely convince oneself that they are not needed.
+
+Rewriting $(\lam{x}{e_1})\,e_2$ to $\subst{e_1}{e_2}{x}$ is the basic computational step
+of the $\lambda$-calculus and is called _$\beta$-reduction_. In the pure $\lambda$-calculus,
+we can start with a $\lambda$-term and perform $\beta$-reductions on subterms in any order.
+
+\subsection{Safe Substitution in Mathematics}
+
+The problem of variable capture arises in many other mathematical contexts.
+It can arise anywhere there is a notion of variable binding and substitution.
+
+For example, in the integral calculus, the integral operator is a binder. In the following
+naive attempt to evaluate a definite integral, a variable is incorrectly captured:
+\begin{align*}
+ \int_{0}^{x}(1+\int_0^1 x\,dx)\,dy\ &=\ \left.(y+\int_0^1 yx\,dx)
+ \right|_{y=0}^{y=x}\ =\ (x+\int_0^1 x^2\,dx) - 0\ =\ x+\left.\textstyle{\frac 13}{x^3}\right|_{x=0}^{x=1}\ =\ x + \textstyle{\frac 13}
+\end{align*}
+This is incorrect. The substitution of $x$ for $y$ under the integral in the second step is erroneous, because $x$ is the variable of integration and is bound by the integral operator, whereas $y$ is free. To fix this, we need only change the variable of integration to $z$.
+\begin{align*}
+ \int_{0}^{x}(1+\int_0^1 z\,dz)\,dy\ &=\ \left.(y+\int_0^1 yz\,dz)
+ \right|_{y=0}^{y=x}\ =\ (x+\int_0^1 xz\,dz) - 0\ =\ x+\left.\textstyle{\frac 12}{xz^2}\right|_{z=0}^{z=1}\ =\ \textstyle{\frac 32}x
+\end{align*}
+
+The $\lambda$-calculus formalizes this informal notion and provides a solution in the form of safe substitution.
+
+\section{Rewrite Rules}
+
+\subsection{$\beta$-reduction}
+
+The _$\beta$-reduction_ rule is the main rule by which evaluation takes place in the $\lambda$-calculus:
+\[
+(\lam x{e_1})\,e_2\ \stepsone\ \subst{e_1}{e_2}x.
+\]
+An instance of the left-hand side is called a _redex_ and the corresponding instance of the right-hand side is called the _contractum_. In the pure $\lambda$-calculus, a $\beta$-reduction may be performed at any time to any subterm that is a redex of the $\beta$-rule. The rule is applied by replacing the redex by its corresponding contractum. For example,
+\[
+\lam x\underbrace{(\lam yy)\,x}_{\beta\text{ redex}}\ \stepsone\ \lam xx
+\]
+Here the subterm $(\lam yy)\,x$, which is a redex of the $\beta$-rule, is replaced by its contractum $x$, which is $\subst yxy$.
+
+\subsection{$\alpha$-conversion}
+
+In $\lam x{xz}$, the name of the bound variable $x$ does not really matter.
+This term is semantically the same as $\lam y{yz}$.
+A renaming like this is known as an _$\alpha$-conversion_ or _$\alpha$-reduction_.
+In an $\alpha$-conversion, the new bound variable must be chosen so as to avoid capture.
+If a term $\alpha$-reduces to another term, then the two terms are said to be \emph{$\alpha$-equivalent}.
+This defines an equivalence relation on the set of terms, denoted $e_1 =_\alpha e_2$.
+
+Recall the definition of free variables $\FV e$ of a term $e$. In general we have
+\[
+\lam xe\ =_\alpha\ \lam y{\subst eyx} \text{ if } y\notin \FV e.
+\]
+The proviso $y\notin\FV e$ is to avoid the capture of any free occurrences of $y$ in $e$ as a result of the renaming.
+The $y$ substituted for $x$ cannot be captured by a binding operator $\lambda y$ already in $e$ because safe substitution $\subst eyx$ would not let that happen---it would rename the bound variable accordingly.
+
+\subsection{Stoy Diagrams and de Bruijn Indices}
+
+\begin{wrapfigure}[6]{r}{50mm}
+ % \begin{center}
+  \begin{tikzpicture}[->, >=stealth', auto, thick, scale=.4,
+   place/.style={circle,fill,inner sep=1.2pt}]
+   \node (0) at (.3,.06) {$\lambda$};
+   \node (1) at (1,0) [place] {};
+   \node (2) at (2,0) {$.(\lambda$};
+   \node (3) at (3,0) [place] {};
+   \node (4) at (4,0) {$.(\lambda$};
+   \node (5) at (5,0) [place] {};
+   \node (6) at (5.7,-.18) {$.$};
+   \node (7) at (6.4,0) [place] {}
+    edge [->,bend right=45,in=210] (5);
+   \node (8) at (7.1,0) [place] {}
+    edge [->,bend right=45] (3);
+   \node (9) at (7.8,0) {$)$};
+   \node (10) at (8.5,0) [place] {}
+    edge [->,bend right=45] (1);
+   \node (11) at (9.2,0) {$)$};
+   \node (12) at (9.9,0) [place] {}
+    edge [->,bend right=45] (1);
+  \end{tikzpicture}
+ % \end{center}
+ \caption{A Stoy diagram}
+ \label{fig:stoy}
+\end{wrapfigure}
+There are some other ways to represent bindings without variables. One way is with _Stoy diagrams_ (after Joseph E.~Stoy).
+We can create a Stoy diagram for a closed term in the following manner.
+Instead of writing a term with variable names, we replace each occurrence of a variable with
+a dot, then connect that dot to the binding operator that binds that variable.
+For example, $\lam x{(\lam y{(\lam x{xy})\,x})\,x}$ becomes the
+Stoy diagram shown in Fig.~\ref{fig:stoy}. Two terms are
+$\alpha$-equivalent iff they have the same Stoy diagram, so there is no need for $\alpha$-conversion.
+
+A related approach is
+to represent variables using _de Bruijn indices_ (after Nicolaas Govert de Bruijn). Here we
+replace each occurrence of a variable with a natural number indicating the binding operator
+that binds it. The variable is replaced by the number $n$ if the binding operator that binds
+it has the $n$-th smallest scope (counting from 0) among all scopes containing that occurrence
+of the variable. The example above becomes $\lam {}{(\lam {}{(\lam {}{0\,1})\,1})\,0}$.
+As with Stoy diagrams, two terms are $\alpha$-equivalent iff their de Bruijn terms are identical.
+
+\subsection{$\eta$-reduction}
+
+Consider the two terms $e$ and $\lam x{ex}$, where $x\not\in\FV e$.
+If these two terms are both applied to an argument $e'$, then they will both reduce to $e\,e'$. Formally,
+\[
+(\lam x{e_1x})\,e_2\ \stepsone\ e_1\,e_2 \text{ if $x\notin\FV{e_1}$}.
+\]
+
+This says that $e$ and $\lam x{ex}$ behave the same way as functions and should be considered equal. Another way of stating this is that $e$ and $\lam x{ex}$ behave the same way in all contexts of the form $\hole\,e'$.
+
+This gives rise to a reduction rule called _$\eta$-reduction_:
+\[
+\lam x{ex}\ \xrightarrow{\eta}\ e\ \text{ provided $x\notin\FV e$}.
+\]
+The reverse operation, called _$\eta$-expansion_, is practical as well.
+
+In practice, $\eta$-expansion is used to delay divergence by trapping
+expressions inside $\lambda$-terms. Such terms are sometimes called _thunks_.
+
+\subsection{Values and $\Omega$}
+
+In the classical $\lambda$-calculus, a _value_ is just a term containing no $\beta$-redexes. Such a term is said to be in _normal form_; no further $\beta$-reductions can be applied. Starting from some $\lambda$-term, we might perform $\beta$-reductions as long as possible, seeking to produce a value. We write $e\stepsto v$ when a sequence of $\beta$-reductions starting with $e$ produces the value $v$. Does this always happen eventually? Let us define an expression we will call $\Omega$:
+\[
+\Omega\ \definedas\ (\lam x{xx})\,(\lam x{xx})
+\]
+What happens when we try to evaluate it?
+\[
+\Omega\ =\ (\lam x{xx})\,(\lam x{xx})
+\ \stepsone\ \subst{(xx)}{(\lam x{xx})}x
+\ =\ \Omega
+\]
+We have just coded an infinite loop! Thus the term $\Omega$ has no value.
+
+\section{Confluence}
+
+A $\lambda$-term in general may have many redexes. A \emph{reduction strategy} is a rule for determining which redex to reduce next. We can think of a reduction strategy as a mechanism for resolving the nondeterminism. In the classical $\lambda$-calculus, no reduction strategy is specified; any redex may be chosen to be reduced next, so the process is nondeterministic. One sequence of reductions may terminate, but another may not. It is even conceivable that different terminating reduction sequences result in different values. Luckily, it turns out that the latter cannot happen.
+
+\begin{wrapfigure}[10]{r}{40mm}
+ % \begin{center}
+  \begin{tikzpicture}[->, >=stealth', auto, thick, inner sep=2pt, node distance=2cm]
+   \node (3) {$e_3$};
+   \node (2) [above right of=3] {$e_2$}
+    edge [->] (3);
+   \node (1) [above left of=3] {$e_1$}
+    edge [->] (3);
+   \node (0) [above right of=1] {$e$}
+    edge [->] (1)
+    edge [->] (2);
+    \node (dummy) [left of=1, node distance=5mm] {};
+  \end{tikzpicture}
+ % \end{center}
+ \caption{Confluence}
+ \label{fig:confluence}
+\end{wrapfigure}
+It turns out that the $\lambda$-calculus is _confluent_ (also known as the _Church--Rosser_ property) under $\alpha$- and $\beta$-reductions. Confluence says that if $e$ reduces by some sequence of reductions to $e_1$, and if $e$ also reduces by some other sequence of reductions to $e_2$, then there exists an $e_3$ such that both $e_1$ and $e_2$ reduce to $e_3$, as illustrated in Fig.~\ref{fig:confluence}.
+
+It follows that normal forms are unique up to $\alpha$-equivalence. If $e\stepsto v_1$ and $e\stepsto v_2$, where $v_1$ and $v_2$ are in normal form, then by confluence they must be $\alpha$-equivalent. Moreover, regardless of the order of previous reductions, it is always possible to get to the unique normal form if it exists.
+
+However, note that it is still possible for a reduction sequence not to terminate, even if the term has a normal form. For example, $(\lam{xy}y)\,\Omega$ has a nonterminating reduction sequence
+\[
+(\lam{xy}y)\,\Omega\ \stepsone\ (\lam{xy}y)\,\Omega\ \stepsone\ \cdots
+\]
+by applying $\beta$-reductions to $\Omega$, but also has a terminating reduction sequence, namely
+\[
+(\lam x{\lam yy})\,\Omega\ \stepsone\ \lam yy
+\]
+by applying a $\beta$-reduction to the whole term.
+It may be difficult to determine the most efficient way to expedite termination. But even if we get stuck in a loop, the confluence property guarantees that it is always possible to get unstuck, provided the normal form exists.

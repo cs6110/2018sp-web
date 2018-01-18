@@ -1,0 +1,386 @@
+\lecture{10}
+\title{Adequacy}
+\date{22 February 2016}
+\maketitle
+
+Both the CBV and CBN $\lambda$-calculus are \emph{deterministic} reduction strategies in the sense that there is at most one reduction that is enabled in any term. When an expression $e$ in a language is evaluated in a deterministic system, one of three things can happen:
+\begin{enumerate}
+\item
+There exists an infinite sequence of expressions $e_1,e_2,\ldots$ such that $e\stepsone e_1\stepsone e_2\stepsone\ldots$~. In this case, we write $e\Uparrow$ and say that $e$ \emph{diverges}.
+\item
+The expression $e$ produces a value $v$ in zero or more steps. In this case we say that $e$ \emph{converges} to the value $v$ and write $e\Downarrow v$.
+\item
+The computation converges to a non-value. When this happens, we say the computation is \emph{stuck}.\footnote{This cannot happen with our CBN-to-CBV translation, but we will see some examples soon enough.}
+\end{enumerate}
+
+A semantic translation is \emph{adequate} if these three behaviors in the source system are accurately reflected in the target system, and vice versa. This relationship is illustrated in the following diagram:
+%\begin{center}
+%\begin{picture}(100,50)
+%%\thicklines
+%\put(0,0){\makebox(0,0)[c]{$\SB e$}}
+%\put(0,50){\makebox(0,0)[c]{$e$}}
+%\put(53,0){\makebox(0,0)[c]{$v'$}}
+%\put(80,50){\makebox(0,0)[c]{$v$}}
+%\put(80,0){\makebox(0,0)[c]{$\SB v$}}
+%\put(-3,25){\makebox(0,0)[r]{$\SB\cdot$}}
+%\put(83,25){\makebox(0,0)[l]{$\SB\cdot$}}
+%\put(80,44){\vector(0,-1){36}}
+%\put(0,44){\vector(0,-1){36}}
+%\put(8,0){\vector(1,0){37}}
+%\put(8,50){\vector(1,0){65}}
+%\put(26,3){\makebox(0,0)[b]{$*$}}
+%\put(40,53){\makebox(0,0)[b]{$*$}}
+%\put(65,0){\makebox(0,0)[c]{$\approx$}}
+%\end{picture}
+%\end{center}
+\begin{center}
+\begin{tikzpicture}[->, >=stealth', node distance=24mm, auto]
+\small
+ \node (NW) {$e$};
+ \node (NE) [right of=NW] {$v$};
+ \node (SW) [below of=NW, node distance=16mm] {$\SB e$};
+ \node (SE) [below of=NE, node distance=16mm, xshift=-3.2mm] {$v'\approx\SB v$};
+ \path (NW) edge node {$_{\textstyle*}$} (NE);
+ \path (NW) edge node [swap] {$\SB\cdot$} (SW);
+ \path (SW) edge node {$_{\textstyle*}$} (SE);
+ \path (NE) edge node {$\SB\cdot$} ($(SE.north)!0.5!(SE.north east)$);
+\end{tikzpicture}
+\end{center}
+If $e$ converges to a value $v$ in the source language, then $\SB e$ must converge to some value $v'$ that is equivalent (e.g.~$\beta$-equivalent) to $\SB v$ in the target language, and vice-versa. This is formally stated as two properties, \emph{soundness} and \emph{completeness}. For our CBN-to-CBV translation, these properties take the following form:
+
+\textsf{Soundness:}
+\begin{enumerate}
+\romanize
+\item
+$\SB e\Downarrow_{\mathrm{cbv}} t\ \Imp\ \exists v\ t\approx\SB v \wedge e\Downarrow_{\mathrm{cbn}} v$
+\item
+$\SB e\Uparrow_{\mathrm{cbv}}\ \Imp\ e\Uparrow_{\mathrm{cbn}}$
+\end{enumerate}
+\textsf{Completeness:}
+\begin{enumerate}
+\romanize
+\item
+$e\Downarrow_{\mathrm{cbn}} v\ \Imp\ \exists t\ t\approx\SB v \wedge \SB e\Downarrow_{\mathrm{cbv}} t$
+\item
+$e\Uparrow_{\mathrm{cbn}}\ \Imp\ \SB e\Uparrow_{\mathrm{cbv}}$.
+\end{enumerate}
+%
+%\reasoning{\exists v'\ \SB e \goesto *{\mathrm{cbv}} v' \wedge v'\approx\SB v}
+%\begin{eqnarray*}
+%\SB e \goesto *{\mathrm{cbv}} v' &\Imp& \reason{\exists v\ v'\approx\SB v \wedge e \goesto *{\mathrm{cbn}} v}{(soundness)}\\
+%e \goesto *{\mathrm{cbn}} v &\Rightarrow& \reason{\exists v'\ v'\approx\SB v \wedge \SB e \goesto *{\mathrm{cbv}} v'}{(completeness)}
+%\end{eqnarray*}
+where $\approx$ is some notion of target term equivalence that is preserved by evaluation.
+
+Soundness says that the computation in the CBV domain starting from the image $\SB e$ of a CBN program $e$ accurately simulates the computation starting from $e$ in the CBN domain. Thus if the CBV process terminates in a value, then so must the CBN process, and the values must be related in the sense described formally above; and if the CBV computation diverges, then so does the CBN computation. Completeness says the opposite:\ the computation in the CBN domain starting from $e$ is accurately simulated by the computation in the CBV domain starting from $\SB e$.
+
+\emph{Adequacy} is the combination of soundness and completeness.
+
+\section{Proving Adequacy}
+
+We would like to show that evaluation commutes with our translation
+$\SB\cdot$ from CBN to CBV. To do this, we first need a notion of target term
+equivalence ($\approx$) that is preserved by evaluation. This is made more
+challenging because as evaluation takes place in the target language,
+intermediate terms are generated that are not the translation of any
+source term. For some translations (but not this one), the reverse may
+also happen. Therefore, equivalence needs to allow for some extra
+$\beta$-redexes that appear during translation. We can define this equivalence
+by structural induction on CBV target terms according to the following rules:
+\begin{center}
+\AxiomC{$x\approx x$}
+\DisplayProof
+\quad
+\AxiomC{$t \approx t'$}
+\UnaryInfC{$\lam xt \approx \lam x{t'}$}
+\DisplayProof
+\quad
+\AxiomC{$t_0 \approx t_0'$}
+\AxiomC{$t_1 \approx t_1'$}
+\BinaryInfC{$t_0\,t_1 \approx t_0'\,t_1'$}
+\DisplayProof
+\quad
+\AxiomC{$t \approx (\lam zt)\,\ID$, \text{where $z \not\in \FV t$}}
+\DisplayProof
+\end{center}
+Here, $t$ represents target terms, to keep them distinct from source
+terms $e$. We also include rules so that the relation $\approx$ is reflexive,
+symmetric, and transitive. One can show easily that if two terms are
+equivalent with respect to this relation, then they have the same
+$\beta$-normal form.
+
+To show adequacy, we show that each evaluation step in the source
+term is mirrored by a sequence of evaluation steps in the corresponding target term,
+and vice versa.  So we define a correspondence $\apprle$
+between source and target terms that is more general than the
+translation $\SB\cdot$ and is preserved during evaluation of both source
+and target.
+
+We write $e\apprle t$ to mean that CBN term $e$ corresponds to CBV term $t$.
+The following proposition captures the idea that CBV evaluation
+simulates CBN evaluation at the level of individual steps:
+\begin{eqnarray}
+e\apprle t\ \wedge\ e\to e' &\Rightarrow& \exists t'\ t\xrightarrow * t'\ \wedge\ e'\apprle t'
+\label{eqn:prop}
+\end{eqnarray}
+This can be visualized as a commutative diagram:
+%\begin{center}
+%\begin{picture}(100,50)
+%\put(0,0){\makebox(0,0)[c]{$t$}}
+%\put(0,50){\makebox(0,0)[c]{$e$}}
+%\put(50,0){\makebox(0,0)[c]{$t'$}}
+%\put(50,50){\makebox(0,0)[c]{$e'$}}
+%\put(0,8){\vector(0,1){36}}
+%\put(0,8){\vector(0,-1){0}}
+%\put(-4,25){\makebox(0,0)[r]{$\apprle$}}
+%\put(54,25){\makebox(0,0)[l]{$\apprle$}}
+%\put(50,8){\vector(0,1){36}}
+%\put(50,8){\vector(0,-1){0}}
+%\put(8,0){\vector(1,0){36}}
+%\put(8,50){\vector(1,0){36}}
+%\put(25,3){\makebox(0,0)[b]{$*$}}
+%\put(75,0){\makebox(0,0)[c]{$(\approx\SB{e'})$}}
+%\end{picture}
+%\end{center}
+\begin{center}
+\begin{tikzpicture}[->, >=stealth', node distance=24mm, auto]
+\small
+ \node (NW) {$e$};
+ \node (NE) [right of=NW] {$e'$};
+ \node (SW) [below of=NW, node distance=16mm] {$t$};
+ \node (SE) [below of=NE, node distance=16mm] {$t'$};
+ \node (SEi) [right of=SE, node distance=2mm, anchor=west] {$(\approx\SB{e'})$};
+ \path (NW) edge node {$1$} (NE);
+ \path (NW) edge[-] node [swap] {$\apprle$} (SW);
+ \path (SW) edge node {$_{\textstyle*}$} (SE);
+ \path (NE) edge[-] node {$\apprle$} (SE);
+\end{tikzpicture}
+\end{center}
+In fact, since in this case the source language cannot get stuck during
+evaluation, and both languages have deterministic evaluation,
+\eqref{eqn:prop} ensures that evaluation in each language corresponds
+to the other.
+
+We define the relation $\apprle$ in such a way that $e \apprle \SB e $. Then,
+using \eqref{eqn:prop}, we can show that any trace in the source
+language produces a corresponding trace in the target by induction on
+the number of source-language steps.
+
+We define the relation $\apprle$ by the following rules:
+
+\begin{equation}
+\AxiomC{$x\apprle x\,\ID$}
+\DisplayProof
+\qquad
+\AxiomC{$e\apprle t$}
+\UnaryInfC{$\lam xe \apprle \lam xt$}
+\DisplayProof
+\qquad
+\AxiomC{$e_0\apprle t_0$}
+\AxiomC{$e_1\apprle t_1$}
+\BinaryInfC{$e_0\,e_1 \apprle t_0\,(\lam \, t_1)$}
+\DisplayProof
+\qquad
+\AxiomC{$e\apprle t$}
+\UnaryInfC{$e \apprle (\lam\, t)\,\ID$}
+\DisplayProof
+\label{eqn:sim}
+\end{equation}
+
+For simplicity, we ignore the fresh variable that would be used in
+the new lambda abstraction in the last two rules.
+
+The first three rules of \eqref{eqn:sim} ensure that a source term corresponds to its translation.
+The last rule is different; it takes care of the extra $\beta$-reductions that
+may arise during evaluation. Because the right-hand side of the $\apprle$ relation becomes
+structurally smaller in this rule's premise, the definition of the relation is still well-founded.
+The first three rules are well-founded based on the structure of $e$; the last
+is well-founded based on the structure of $t$. If we were proving a more complex translation correct,
+we would need more rules like the last rule for other
+meaning-preserving target-language reductions.
+
+First, let us warm up by showing that a term corresponds to its translation.
+
+\begin{lemma}
+$e \apprle \SB e$.
+\label{lem:trans}
+\end{lemma}
+\begin{proof}
+An easy structural induction on $e$.
+\begin{itemize}
+\item Case $x$: $x \apprle x\,\ID$ by definition.
+\item Case $\lam x e'$: We have $\SB e = \lam x \SB{e'} $.
+By the induction hypothesis, $e' \apprle \SB{e'} $, so $\lam x e' \apprle \lam x \SB{e'} $
+by the second rule of \eqref{eqn:sim}.
+\item Case $e_0\,e_1$: We have $\SB e = \SB{e_0}\,(\lam\,{\SB{e_1}})$.
+By the induction hypothesis, $e_0 \apprle \SB{e_0}$ and $e_1 \apprle \SB{e_1}$. Therefore
+by the third rule of \eqref{eqn:sim}, $e_0\,e_1 \apprle \SB{e_0}\,\SB{e_1}$.
+\end{itemize}
+\end{proof}
+
+Next, let us show that if $e$ corresponds to $t$, its translation is equivalent to $t$.
+
+\begin{lemma}
+$e \apprle t\ \Rightarrow\ \SB e \approx t$.
+\label{lem:equiv}
+\end{lemma}
+\begin{proof}
+Induction on the derivation of $e \apprle t$.
+
+\begin{itemize}
+\item Case $x \apprle x\,\ID$:\\
+This case is trivial: $\SB x = x\,\ID$.
+
+\item Case $\lam x {e'} \apprle \lam x{t'}$ where $e' \apprle t'$:\\
+Here, $\SB e = \lam x {\SB{e'} }$.
+By the induction hypothesis, $\SB{e'}\approx t'$, therefore
+$\lam x{\SB{e'} } \approx \lam x{t'}$ as required.
+
+\item Case $e_0\,e_1 \apprle t_0\,(\lam\,{t_1})$ where $e_0\apprle t_0$ and $e_1\apprle t_1$:\\
+Here, $\SB{e_0\,e_1} = \SB{e_0} (\lam\,\SB{e_1})$, and by the induction hypothesis,
+$\SB{e_0} \approx t_0$ and $\SB{e_1} \approx t_1$.
+From the definition of $\approx$, we have
+$\SB{e_0} (\lam\,\SB{e_1}) \approx t_0\,(\lam\,{t_1})$.
+
+\item Case $e \apprle (\lam\,t)\,\ID$ where $e\apprle t$:\\
+The induction hypothesis is $\SB e \approx t$. But $t \approx (\lam\,t)\,\ID$, and
+$\approx$ is transitive.
+\end{itemize}
+\end{proof}
+
+Given these definitions, we can prove \eqref{eqn:prop} by induction on
+the derivation of $e\apprle t$. We will need two useful lemmas. The first is
+a substitution lemma that says substituting corresponding terms into
+corresponding terms produces corresponding terms:
+
+\begin{lemma}
+$e_1 \apprle t_1 \wedge e_2 \apprle t_2 \Rightarrow \subst{e_2}{e_1}{x} \apprle \subst{t_2}{\lam{}{t_1}}{x}$.
+\label{lem:subst}
+\end{lemma}
+\begin{proof}
+We proceed by induction on the derivation of $e_2 \apprle t_2$.
+\begin{itemize}
+\item Case $x \apprle x\,\ID$:\\
+We have $\subst{e_2}{e_1}{x} = e_1$ and
+$\subst{t_2}{\lam{}{t_1}}{x} = (\lam{}{t_1})\,\ID$.
+By the fourth rule of \eqref{eqn:sim},
+we have $e_1 \apprle (\lam{}{t_1})\,\ID$.
+
+\item Case $y \apprle y\,\ID$ where $y\neq x$: \\
+This case is trivial, as the substitution has no effect.
+
+\item Case $\lam xe \apprle \lam xt$ where $e\apprle t$: \\
+Again, this case is trivial, as the substitutions into $e_2$ and $t_2$ have no effect.
+\item Case $\lam ye \apprle \lam yt$ where $e\apprle t$, $x\neq y$:\\
+Here 
+$\subst{e_2}{e_1}{x} = \lam y{\subst{e}{e_1}{x}}$ and
+$\subst{t_2}{\lam{}{t_1}}{x} = \lam y{\subst{t}{\lam{}{t_1}}{x}}$.
+Since $e\apprle t$, by the induction hypothesis we have
+$\subst{e}{e_1}{x} \apprle \subst{t}{\lam{}{t_1}}{x}$.
+Therefore by definition, $\lam y{\subst{e}{e_1}x} \apprle \lam
+y{\subst{t}{\lam{}{t_1}}x}$, as required.
+
+\item Case $e\,e' \apprle t\,(\lam{}{t'})$, where $e\apprle t$ and $e'\apprle t'$: \\
+We have $\subst{e_2}{e_1}{x} = \subst{e}{e_1}{x}\,\subst{e'}{e_1}{x}$,
+and $\subst{t_2}{\lam{}{t_1}}{x} =
+\subst{t}{\lam{}{t_1}}{x}\,(\lam{}{\subst{t'}{t_1}{x}})$. From the
+induction hypothesis, $\subst{e}{e_1}{x} \apprle \subst{t}{\lam{}{t_1}}x$
+and $\subst{e'}{e_1}{x} \apprle \subst{t'}{\lam{}{t_1}}x$.
+Therefore, by definition we have
+$\subst{e}{e_1}{x}\,\subst{e'}{e_1}{x}
+\apprle \subst{t}{\lam{}{t_1}}{x}\,(\lam{}{\subst{t'}{t_1}{x}})$.
+
+\item Case $e_2 \apprle (\lam\, t_2')\,\ID$, where $e_2\apprle t_2'$: \\
+We need to show that $\subst{e_2}{e_1}{x} \apprle \subst{((\lam\,t_2')\,\ID)}{\lam\,t_1}{x}$; that is,
+$\subst{e_2}{e_1}{x} \apprle ((\lam\, \subst{t_2'}{\lam\,t_1}{x})\,\ID)$.
+From the induction hypothesis, we have $\subst{e_2}{e_1}{x} \apprle 
+\subst{t_2'}{\lam{}{t_1}}x$. By definition, this means
+$\subst{e_2}{e_1}{x} \apprle (\lam\,\subst{t_2'}{\lam{}{t_1}}x)\,\ID$.
+\end{itemize}
+\end{proof}
+
+The next lemma says that if a value $\lam xe$ corresponds
+to a term $t$, then $t$ reduces to a corresponding $\lambda$-term $\lam\,t'$.
+
+\begin{lemma}
+\label{lem:value-reduction}
+$\lam xe\apprle t \Rightarrow \exists t'\ t \to \lam{x}{t'}\ \wedge\ e \apprle t'$.
+\end{lemma}
+\begin{proof}
+By induction on the derivation of $\lam xe\apprle t$.
+\begin{itemize}
+\item Case $y\apprle y\,\ID$: Impossible, as $y \ne \lam{x}{e}$.
+\item Case $\lam xe \apprle \lam x{t'}$ where $e\apprle t'$: \\
+Here, $t = \lam x{t'}$, and the result is immediate.
+
+\item Case $e_0\,e_1 \apprle t_0\,(\lam{}{t_1})$: Impossible, as $e_0\,e_1 \ne \lam{x}{e}$.
+
+\item Case $e_0 \apprle (\lam{}{t_0})\,\ID $, where $e_0\apprle t_0$: \\ In this case
+$e_0 = \lam{x}{e}$, and $t =((\lam{}{t_0})\,\ID )$. By the induction
+hypothesis, there is some $t'$ such that $t_0 \to 
+\lam{x}{t'}$ and $e \apprle t'$. Since $t =((\lam{}{t_0})\,\ID ) \stepsone t_0$ we
+have $t \to \lam{x}{t'}$, as required.
+\end{itemize}
+\end{proof}
+
+We are now ready to prove \eqref{eqn:prop}.
+
+\begin{proof}
+By induction on the derivation of $e\apprle t$:
+\begin{itemize}
+\item Case $x \apprle x\,\ID$:
+Vacuously true, as there is no evaluation step $e\stepsone e'$.
+\item Case $\lam x e \apprle \lam x t$:
+A value: also vacuously true.
+\item Case $e_0\,e_1\apprle t_0\,(\lam{}{t_1})$, where $e_0\apprle t_0$ and $e_1\apprle t_1$:\\
+We show this by cases on the derivation of $e\stepsone e'$:
+\begin{itemize}
+\item Case $e_0\,e_1\stepsone e_0'\,e_1$, where $e_0\stepsone e_0'$:\\
+By the induction hypothesis, $\exists t_0'\ e_0'\apprle t_0'\wedge t_0\to t_0'$.
+It is easy to see that $t_0\,(\lam{}{t_1})\to t_0'\,(\lam{}{t_1})$.
+By the third rule of \eqref{eqn:sim}, $e_0'\,e_1 \apprle t_0'\,(\lam{}{t_1})$, as required.
+
+\item Case $(\lam{x}{e_2})\,e_1\stepsone \subst{e_2}{e_1}x$:\\
+Here $\lam{x}{e_2} \apprle t_0$ and $e_1\apprle t_1$. 
+
+By Lemma~\ref{lem:value-reduction}, there exists a $t_2$
+such that $t_0 \to \lam{x}{t_2}$ and $e_2 \apprle t_2$. Therefore,
+we have $t_0\,(\lam \, t_1) \to (\lam{x}{t_2})~(\lam \, t_1)
+\stepsone \subst{t_2}{\lam{}{t_1}}x$. But from the substitution lemma
+above (Lemma~\ref{lem:subst}),
+we know that $\subst{e_2}{e_1}{x} \apprle \subst{t_2}{\lam{}{t_1}}x$,
+as required.
+\end{itemize}
+
+\item Case $e_0 \apprle (\lam{}{t_0})~\ID$, where $e_0\apprle t_0$: \\
+By the induction hypothesis, $\exists t_0'\ e_0\apprle t_0'\ \wedge\ t_0\to t_0'$.
+It is easy to see that therefore
+$((\lam{}{t_0})~\ID) \stepsone t_0\,\to t_0'$, as required.
+\end{itemize}
+\end{proof}
+
+Having proved \eqref{eqn:prop}, we can show completeness of the
+translation. If we start with a source term $e$ and its translation
+$\SB e $, we know from Lemma~\ref{lem:trans} that $e \apprle \SB e $. From
+\eqref{eqn:prop}, we know that each step of evaluation of $e$
+is mirrored by execution on the target side that preserves $e\apprle t$.
+If the evaluation of $e$ diverges, so will the evaluation of $\SB e$.
+If the evaluation of $e$ converges on a value $v$, then
+the evaluation of $\SB e$ will reach a convergent (by
+Lemma~\ref{lem:value-reduction}) term $t$ such that
+$v \apprle t$. And by Lemma~\ref{lem:equiv}, $\SB v \approx t$. This demonstrates
+completeness.
+
+To show soundness of the translation, we need to show that every
+evaluation in the target language corresponds to some evaluation in the
+source language. Suppose we have a target-language evaluation
+$t\to v'$, where $t = \SB e$, but there is no corresponding
+source-language evaluation of $e$. There are three possibilities.
+First, the evaluation of $e$ could get stuck. This cannot happen for
+this source language because all terms are either values or have a
+legal evaluation. Second, the evaluation of $e$ could evaluate to a
+value $v$. But then $v$ must correspond to $v'$, because the
+target-language evaluation is deterministic. Third, the evaluation of
+$e$ might diverge. But then \eqref{eqn:prop} says there is a
+divergent target-language evaluation. The determinism of the
+target language ensures that cannot happen.

@@ -1,0 +1,22 @@
+\documentclass{6110}
+\usepackage{setspace}
+\usepackage{bbm}
+
+\usepackage{totcount}
+\newtotcounter{cite}
+\let\origcite=\cite
+\def\cite{\stepcounter{cite}\origcite}
+\let\orignocite=\nocite
+\def\nocite{\stepcounter{cite}\orignocite}
+
+\begin{document}
+
+% Build this file with -jobname DIR to get a particular lecture.
+\input{lectures/\jobname/content}
+
+\ifnum\value{cite}>0
+\bibliographystyle{plain}
+\bibliography{6110}
+\fi
+
+\end{document}

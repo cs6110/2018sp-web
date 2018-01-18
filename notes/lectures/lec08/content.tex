@@ -1,0 +1,280 @@
+\lecture{8}
+\title{Structural Operational Semantics and \IMP}
+\date{17 February 2016}
+\maketitle
+
+Today we introduce a very simple imperative language, \IMP, along with two systems of
+rules for evaluation called \emph{small-step} and \emph{big-step} semantics. These
+both fall under the general style called \emph{structural operational semantics} (SOS).
+We will also discuss why both the big-step and small-step approaches can be useful.
+
+\section{The \IMP\ Language}
+
+\subsection{Syntax of \IMP}
+
+There are three distinct types of expressions in \IMP:
+\begin{itemize}
+\item \emph{arithmetic expressions} \AExp\ with elements denoted by $a,a_0,a_1,\ldots$
+\item \emph{Boolean expressions} \BExp\ with elements denoted by $b,b_0,b_1,\ldots$
+\item \emph{commands} \Com\ with elements denoted by $c,c_0,c_1,\ldots$
+\end{itemize}
+A \emph{program} in the \IMP\ language is a command in \Com.
+
+Let $n,n_0,n_1,\ldots$ denote integers (elements of $\integers=\{\ldots,-2,-1,0,1,2,\ldots\}$). We will view $n$ both as a number (a semantic object) and as a numeral (a syntactic object) representing the number $n$. This little bit of ambiguity should not cause any confusion; the numbers and the numerals are in one-to-one correspondence, so there is really no need to distinguish them. Similarly, there is no need to distinguish between the Boolean constants $\TRUE$ and $\FALSE$ (syntactic objects) and the Boolean values $\true,\false\in\Two$ (semantic objects).
+
+Let \Var\ be a countable set of variables ranging over $\integers$. Elements of \Var\ are denoted $x,x_0,x_1\ldots$~.
+
+The BNF grammar for \IMP\ is
+\[
+\begin{array}{r@{\hspace{5mm}}rcl}
+\AExp: & a & ::= & n \bnf x \bnf a_0+a_1 \bnf a_0*a_1 \bnf a_0-a_1\\
+\BExp: & b & ::= & \TRUE \bnf \FALSE \bnf a_0=a_1 \bnf a_0\leq a_1 \bnf b_0\vee b_1 \bnf b_0\wedge b_1 \bnf \neg b\\
+\Com: & c & ::= & \SKIP \bnf \assg xa \bnf \comp{c_0}{c_1} \bnf \ifthenelse b{c_1}{c_2} \bnf \whiledo bc
+\end{array}
+\]
+Note that in this definition, $n+m$ denotes the syntactic expression with three symbols $n$, $+$, and $m$, not to the number that is the sum of $n$ and $m$.
+
+\subsection{Environments and Configurations}
+
+An \emph{environment} (also known as a \emph{valuation} or a \emph{store}) is a function $\sigma:\Var\to\integers$ that assigns an integer to each variable. Environments are denoted $\sigma,\sigma_1,\tau,\ldots$ and the set of all environments is denoted $\Env$. In \IMP\ semantics, environments are always total functions.
+
+A \emph{configuration} is a pair $\config c\sigma$, where $c\in\Com$ is a command and $\sigma$ is an environment. Intuitively, the configuration $\config c\sigma$ represents an instantaneous snapshot of reality during a computation, in which $\sigma$ represents the current values of the variables and $c$ represents the next command to be executed.
+
+\section{Small-Step Semantics}
+
+\emph{Small-step semantics} specifies the operation of a program one step at a time. There is a set of rules that we continue to apply to configurations until reaching a final configuration $\config{\SKIP}{\sigma}$ (if ever). We write $\config c\sigma\stepsone\config{c'}{\sigma'}$ to indicate that the configuration $\config c\sigma$ reduces to $\config{c'}{\sigma'}$ in one step, and we write $\config c\sigma\to\config{c'}{\sigma'}$ to indicate that $\config c\sigma$ reduces to $\config{c'}{\sigma'}$ in zero or more steps. Thus $\config c\sigma\to\config{c'}{\sigma'}$ iff there exists $k\geq 0$ and configurations $\config{c_0}{\sigma_0},\ldots,\config{c_k}{\sigma_k}$ such that $\config c\sigma=\config{c_0}{\sigma_0}$, $\config{c'}{\sigma'}=\config{c_k}{\sigma_k}$, and $\config{c_i}{\sigma_i}\stepsone\config{c_{i+1}}{\sigma_{i+1}}$ for $0\leq i\leq k-1$.
+
+To be completely proper, we will define auxiliary small-step operators $\to_a$ and $\to_b$ for arithmetic and Boolean expressions, respectively, as well as $\to$ for commands\footnote{Winskel \cite{Winskel93} uses $\to_1$ instead of $\stepsone$.}. The types of these operators are
+\begin{eqnarray*}
+\to_a &:& (\AExp\times\Env)\to\AExp\\
+\to_b &:& (\BExp\times\Env)\to\BExp\\
+\to_{\ } &:& (\Com\times\Env)\to(\Com\times\Env)
+\end{eqnarray*}
+Intuitively, $\config{a}{\sigma}\to_a n$ if the expression $a$ evaluates to the constant $n$ in environment $\sigma$.
+
+We now present the small-step rules for evaluation in \IMP. Just as with the
+$\lambda$-calculus, evaluation is defined by a set of inference rules
+that inductively define relations consisting of acceptable computation steps.
+
+\subsection{Arithmetic and Boolean Expressions}
+
+\begin{itemize}
+\item
+Variables:\\\
+\begin{align*}
+\Rule{}{\config x\sigma \stepsone_a \sigma(x)}
+\end{align*}
+\item
+Arithmetic:\\
+\begin{gather*}
+\Rule[(\text{where $n_3$ is the sum of $n_1$ and $n_2$})]
+{}
+{\config{n_1+n_2}\sigma \stepsone_a n_3}\\[1em]
+\Rule
+{\config{a_1}\sigma \stepsone_a a_1'}
+{\config{a_1+a_2}\sigma \stepsone_a a_1'+a_2}
+\qquad
+\Rule
+{\config{a_2}\sigma \stepsone_a a_2'}
+{\config{n_1+a_2}\sigma \stepsone_a n_1+a_2'}\\
+\end{gather*}
+and similar rules for $*$ and $-$. These rules say: If the reduction above the line can be performed, then the reduction below the line can be performed. The rules are thus inductive on the structure of the expression to be evaluated.
+
+Note that there is no rule that applies in the case $\config n\sigma$. This configuration is \emph{irreducible}. In all other cases, there is exactly one rule that applies.
+\end{itemize}
+
+The rules for Booleans and comparison operators are similar. We leave them as exercises.
+
+\subsection{Commands}
+
+Let us denote by $\rebind\sigma nx$ the environment that is identical to $\sigma$ except possibly for the value of $x$, which is $n$. That is,
+\begin{eqnarray*}
+\rebind\sigma nx(y) &\definedas&
+\begin{cases}
+\sigma(y) & \text{if } y\neq x,\\
+n & \text{if } y=x.
+\end{cases}
+\end{eqnarray*}
+The construct $\rebind{}nx$ is called a \emph{rebinding operator}. It is a meta-operator that is used to rebind a variable to a different value in the environment. Note that in the definition of $\rebind\sigma nx$, the condition ``$y\neq x$'' does not mean that $y$ and $x$ are bound to different values, but that they are syntactically different variables.
+
+\begin{itemize}
+\item
+Assignment:\\
+\[
+\Rule
+{\phantom{\config a\sigma\stepsone_a a'}}
+{\config{\assg xn}\sigma\stepsone\config\SKIP{\rebind\sigma nx}}
+\qquad
+\Rule
+{\config a\sigma\stepsone_a a'}
+{\config{\assg xa}\sigma\stepsone\config{\assg x{a'}}\sigma}
+\]
+\item
+Sequence:\\
+\[
+\Rule
+{\config{c_0}{\sigma}\stepsone\config{c_0'}{\sigma'}}
+{\config{\comp{c_0}{c_1}}{\sigma}\stepsone\config{\comp{c_0'}{c_1}}{\sigma'}}
+\qquad
+\Rule
+{\phantom{\config{c_0}{\sigma}\stepsone\config{c_0'}{\sigma'}}}
+{\config{\comp{\SKIP}{c_1}}{\sigma}\stepsone\config{c_1}{\sigma}}
+\]
+\item
+Conditional:\\
+\[
+\Rule
+{\config b\sigma\stepsone_b b'}
+{\config{\ifthenelse b{c_0}{c_1}}\sigma\stepsone\config{\ifthenelse{b'}{c_0}{c_1}}\sigma}
+\]
+\[
+\Rule
+{\phantom{\config b\sigma\stepsone_b\TRUE}}
+{\config{\ifthenelse\TRUE{c_0}{c_1}}\sigma\stepsone\config{c_0}\sigma}
+\qquad
+\Rule
+{\phantom{\config b\sigma\stepsone_b\FALSE}}
+{\config{\ifthenelse\FALSE{c_0}{c_1}}\sigma\stepsone\config{c_1}\sigma}
+\]
+\item
+While statement:
+\[
+\Rule{\mbox{\phantom{d}}}{\config{\whiledo bc}{\sigma}\stepsone\config{\ifthenelse{b}{(\comp{c}{\whiledo bc})}{\SKIP}}{\sigma}}
+\]
+\end{itemize}
+There is no rule for $\SKIP$; the configuration $\config{\SKIP}{\sigma}$ is irreducible. In all other cases, there is exactly one rule that applies. These rules tell us all we need to know to run \IMP\ programs.
+
+\section{Big-Step Semantics}
+
+As an alternative to small-step structural operational semantics, which specifies the operation of the program one step at a time, we now consider \emph{big-step operational semantics}, in which we specify the entire transition from a configuration (an $\config{\text{expression}}{\text{environment}}$ pair) to a final value. This relation is denoted $\stepsto$. For arithmetic expressions, the final value is an integer $n\in\integers$; for Boolean expressions, it is a Boolean truth value $\true,\false\in\Two$; and for commands, it is an environment $\sigma:\Var\to\integers$. Thus
+\begin{align*}
+\stepsto_a &: (\AExp\times\Env)\to\integers &
+\stepsto_b &: (\BExp\times\Env)\to\Two &
+\stepsto_{} &: (\Com\times\Env)\to\Env
+\end{align*}
+Here $\Two$ represents the two-element Boolean algebra consisting of the two truth values $\{\true,\false\}$ with the usual Boolean operations. Then
+\begin{itemize}
+\item
+$\config c\sigma\stepsto\sigma'$ says that $\sigma'$ is the environment of the final configuration, starting in configuration $\config c\sigma$;
+\item
+$\config{a}{\sigma}\stepsto_a n$ says that $n\in\integers$ is the integer value of arithmetic expression $a$ evaluated in environment $\sigma$; and
+\item
+$\config{b}{\sigma}\stepsto_b t$ says that $t\in\Two$ is the truth value of Boolean expression $b$ evaluated in environment $\sigma$.
+\end{itemize}
+
+\subsection{Arithmetic and Boolean Expressions}
+
+The big-step rules for arithmetic and Boolean expressions are
+straightforward. The key when writing big-step rules is to think about
+how a recursive interpreter would evaluate the expression in question.
+The rules for arithmetic expressions are:
+\begin{itemize}
+\item
+Constants:
+\[
+\Rule
+{\phantom{f}}
+{\config n\sigma\stepsto_a n}
+\]
+\item
+Variables:
+\[
+\Rule
+{\phantom{f}}
+{\config x\sigma\stepsto_a \sigma(x)}
+\]
+\item
+Operations:
+\[
+\Rule
+[\text{(where $n_2$ is the sum of $n_0$ and $n_1$)}]
+{\config{a_0}{\sigma}\stepsto_a n_0 \qquad \config{a_1}{\sigma}\stepsto_a n_1}
+{\config{a_0+a_1}{\sigma}\stepsto_a n_2}
+\]
+and similarly for $*$ and $-$.
+\end{itemize}
+The rules for evaluating Boolean expressions and comparison operators are similar.
+
+\subsection{Commands}
+
+\begin{itemize}
+\item
+Skip:
+\[
+\Rule
+{}
+{\config{\SKIP}{\sigma}\stepsto\sigma}
+\]
+\item
+Assignments:
+\[
+\Rule
+{\config{a}{\sigma}\stepsto_a n}
+{\config{\assg xa}{\sigma}\stepsto\rebind\sigma nx}
+\]
+\item
+Sequences:
+\[
+\Rule
+{\config{c_0}{\sigma}\stepsto\sigma'\quad\config{c_1}{\sigma'}\stepsto\sigma''}
+{\config{\comp{c_0}{c_1}}{\sigma}\stepsto\sigma''}
+\]
+\item
+Conditionals:
+\[
+\Rule
+{\config{b}{\sigma}\stepsto_b\true\quad\config{c_0}{\sigma}\stepsto\sigma'}
+{\config{\ite b{c_0}{c_1}}{\sigma}\stepsto\sigma'}
+\quad
+\Rule
+{\config{b}{\sigma}\stepsto_b\false\quad\config{c_1}{\sigma}\stepsto\sigma'}
+{\config{\ite b{c_0}{c_1}}{\sigma}\stepsto\sigma'}
+\]
+\item
+While statements:
+\[
+\Rule
+{\config{b}{\sigma}\stepsto_b\false}
+{\config{\whd bc}{\sigma}\stepsto\sigma}
+\quad
+\Rule
+{\config{b}{\sigma}\stepsto_b\true\quad\config c\sigma\stepsto\sigma'\quad\config{\whd bc}{\sigma'}\stepsto\sigma''}
+{\config{\whd bc}{\sigma}\stepsto\sigma''}
+\]
+\end{itemize}
+
+\section{Big-Step vs.\ Small-Step SOS}
+
+If the big-step and small-step semantics both describe the same
+language, we would expect them to agree. In particular,
+the relations $\to$ and $\stepsto$ both capture the idea of a
+complete evaluation. We would expect that if
+$\config c\sigma$ is a configuration that evaluates in the small-step
+semantics to $\config\SKIP{\sigma'}$, then $\sigma'$
+should also be the result of the big-step evaluation, and vice-versa. Formally,
+\begin{theorem}
+For all commands $c\in\Com$ and environments $\sigma,\tau\in\Env$,
+%$\config c\sigma\to\config\SKIP\tau$ if and only if $\config c\sigma\stepsto\tau$.
+\begin{align*}
+\config c\sigma\to\config\SKIP{\tau}\ &\Iff\ \config c\sigma\stepsto\tau.
+\end{align*}
+\end{theorem}
+One can prove this theorem by induction.
+
+Note that this statement about the agreement of big-step and
+small-step semantics has nothing to say about the agreement of
+nonterminating computations.  This is because big-step semantics
+cannot talk directly about nontermination. If $\config c\sigma$ does
+not terminate, then there is no $\tau$ such that $\config
+c\sigma\stepsto\tau$.
+
+Small-step semantics can model more complex features such as
+nonterminating programs and concurrency. However, in many cases it
+involves unnecessary extra work.
+
+If we do not care about modeling nonterminating computations, it is
+often easier to reason in terms of big-step semantics. Moreover,
+big-step semantics more closely models an actual recursive
+interpreter. However, because evaluation skips over intermediate
+steps, all programs without final configurations are
+indistinguishable.

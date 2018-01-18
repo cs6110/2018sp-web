@@ -1,0 +1,209 @@
+\lecture{22}
+\title{Strong Normalization}
+\date{13 April 2016}
+\maketitle
+
+\newcommand\osubst[2]{#1\{#2\}}
+
+A couple of lectures ago, we proved that each term in the simply typed
+$\lambda$-calculus would never get stuck. Today, we want to show that
+it will actually always terminate, no matter what reduction order is
+used. In other words, there are no infinite reduction sequences
+starting from any typable term.  This property is known as _strong
+normalization_.
+
+Formally, we want to prove that if $\judge{}e\tau$, then any reduction
+sequence starting from $e$ eventually leads to a (unique) normal form.
+We will prove this by induction, but we will need a fairly
+sophistiated argument that takes both the typing and reduction order
+into account. For example, even if $e_1$ and $e_2$ terminate, we
+cannot conclude that $(e_1~e_2)$ does: consider $e_1=e_2=\lam x{xx}$.
+\section{Church vs Curry}
+
+We will prove this theorem in the pure simply-typed $\lambda$-calculus
+in Curry style.  This differs from Church style in that the binding
+occurrence of a variable in a $\lambda$-abstraction is not annotated
+with its type.
+
+Let $\alpha,\beta,\ldots$ denote type variables, $x,y,\ldots$ term
+variables, $\sigma,\tau,\ldots$ types, and $d,e,\ldots$ terms. In the
+Curry-style simply typed $\lambda$-calculus, terms and types are
+defined by
+\begin{align*}
+& e\ ::=\ x \bnf e_1~e_2 \bnf \lam xe && \tau\ ::=\ \alpha \bnf \sigma\to\tau
+\end{align*}
+The typing rules are
+\begin{align*}
+& \judge{\Gamma,\,\type x\tau}x\tau &&
+\frac{\Gjudge e{\sigma\to\tau}\quad\Gjudge d\sigma}{\Gjudge{(e~d)}\tau} &&
+\frac{\judge{\Gamma,\,\type x\sigma}e\tau}{\Gjudge{\lam xe}{\sigma\to\tau}}
+\end{align*}
+where $\Gamma$ is a \emph{type environment}, a partial function from type variables to types.
+Note that in Church style, a closed term can have at most one type, but in Curry style, if it has any type at all, then it has infinitely many. For example, $\judge{}{\lam xx}{((\alpha\to\beta)\to\gamma)\to((\alpha\to\beta)\to\gamma)}$. In general, if $\judge{}e\tau$, then also $\judge{}e{\tau'}$, where $\tau'$ is any substitution instance of $\tau$.
+
+A term $e$ is _typable_ if there exists a type environment $\Gamma$ and a type $\tau$ such that $\Gjudge e\tau$. One can show by induction that if $\Gjudge e\tau$, then $\FV e\subseteq\dom\Gamma$.
+
+\section{Strong Normalization}
+
+By the Church--Rosser theorem, normal forms are unique up to $\alpha$-equivalence, so any two reduction strategies starting from the same term that terminate must yield the same result up to $\alpha$-equivalence. However, there may be some strategies that terminate and some that do not.
+
+A term $e$ is _strongly normalizing_ (SN) if all $\beta$-reduction sequences starting from $e$ converge to a normal form; equivalently, if there is no infinite $\beta$-reduction sequence starting from $e$. Our main theorem is
+
+\begin{theorem}
+\label{thm:SN}
+All typable terms are strongly normalizing.
+\end{theorem}
+
+%\subsection{Logical Relations}
+
+%\renewcommand\judgeUSN[3]{#1\mathrel\vdash\mathit{SN}_{#3}(#2)}
+
+%We use the technique of \emph{logical relations}.
+
+\begin{definition}
+\label{def:USN}
+%Say that a term $e$ is \emph{ultra-strongly normalizing with respect to $\Gamma$ and $\sigma$} and w
+Define $\judgeUSN\Gamma e\tau$ if
+\begin{enumerate}
+\renewcommand\labelenumi{\upshape(\Alph{enumi})}
+\item
+$\judge\Gamma e\tau$, and
+\item
+if $\tau=\sigma_1\to\cdots\to\sigma_n\to\alpha$ and $\judgeUSN\Gamma{d_i}{\sigma_i}$ for $1\leq i\leq n$, then $(e~d_1~\cdots~d_n)$ is strongly normalizing.
+\end{enumerate}
+\end{definition}
+
+%A term $e$ is \emph{ultra-strongly normalizing} (USN) if it is ultra-strongly normalizing with respect to some $\Gamma$ and $\sigma$.
+
+Definition \ref{def:USN} may seem circular, but it is not: $\judgeUSN\Gamma e\tau$ is defined in terms of $\judgeUSN\Gamma{d_i}{\sigma_i}$, and the $\sigma_i$ are proper subexpressions of $\tau$, so it is well-defined by structural induction on types.
+
+Let $\delta:\Var\pfun\{\text{terms}\}$ be a valuation of variables and $\Gamma,\Delta:\Var\pfun\{\text{types}\}$ type environments. Define
+\begin{align*}
+\judge\Gamma\delta\Delta\ &\Iffdef\ \forall x\in\dom\delta\ \ \judge\Gamma{\delta(x)}{\Delta(x)}\\
+\judgeUSN\Gamma\delta\Delta\ &\Iffdef\ \forall x\in\dom\delta\ \ \judgeUSN\Gamma{\delta(x)}{\Delta(x)}.
+\end{align*}
+
+Let $\osubst e\delta$ denote the simultaneous safe substitution of $\delta(x)$ for $x$ in $e$ for all $x\in\dom\delta$.
+
+\begin{lemma}
+\label{lem:USNapp}
+The following rule is valid:
+\begin{align*}
+\AxiomC{$\judgeUSN{\Gamma}{{e_1}}{\sigma\to\tau}$}
+\AxiomC{$\judgeUSN{\Gamma}{{e_2}}\sigma$}
+\BinaryInfC{$\judgeUSN{\Gamma}{({e_1}~{e_2})}\tau$}
+\DisplayProof
+\end{align*}
+\end{lemma}
+\begin{proof}
+Surely part (A) of Definition \ref{def:USN} holds, as without the \textit{SN} decoration, it is just the application rule. For part (B), suppose $\tau=\sigma_1\to\cdots\to\sigma_n\to\alpha$ and $\judgeUSN\Gamma{d_i}{\sigma_i}$ for $1\leq i\leq n$. We wish to show that $(e_1~e_2~d_1~\cdots~d_n)$ is strongly normalizing. But this follows directly from the two premises.
+\end{proof}
+
+\begin{lemma}
+\label{lem:SN}
+Let $\delta:\Var\pfun\{\text{terms}\}$ be a valuation of variables and $\Gamma,\Delta:\Var\pfun\{\text{types}\}$ type environments with $\dom\delta=\dom\Delta$ and $\dom\Gamma\cap\dom\Delta=\emptyset$. The following rule is valid:
+\begin{align*}
+\AxiomC{$\judge{\Gamma,\,\Delta}e\tau$}
+\AxiomC{$\judgeUSN\Gamma{\delta}{\Delta}$}
+\BinaryInfC{$\judgeUSN\Gamma{\osubst e\delta}\tau$}
+\DisplayProof
+\end{align*}
+%
+%\begin{enumerate}
+%\renewcommand\labelenumi{\upshape(\roman{enumi})}
+%\item
+%$\judge{\Gamma,\,\Delta}e\tau$, and
+%\item
+%$\judgeUSN\Gamma{\delta}{\Delta}$,
+%\end{enumerate}
+%then $\judgeUSN\Gamma{\osubst e\delta}\tau$.
+\end{lemma}
+\begin{proof}
+The proof is by induction on the structure of $e$.
+
+If $e$ is a variable $x\in\dom\delta$, the left-hand premise of the rule is $\judge{\Gamma,\,\Delta}{x}{\tau}$, thus $\tau=\Delta(x)$. The conclusion of the rule is then $\judgeUSN{\Gamma}{\delta(x)}{\Delta(x)}$, which is immediate from the right-hand premise.
+
+If $e$ is a variable $x\not\in\dom\delta$, the left-hand premise is $\judge{\Gamma,\,\Delta}{x}{\tau}$, thus $\tau=\Gamma(x)$. The conclusion of the rule is $\judgeUSN{\Gamma}{x}{\tau}$. We have $\judge{\Gamma}{x}{\tau}$ from the premise, which gives part (A) of Definition \ref{def:USN}. For part (B), suppose $\tau=\sigma_1\to\cdots\to\sigma_n\to\alpha$ and $\judgeUSN\Gamma{d_i}{\sigma_i}$ for $1\leq i\leq n$. We wish to show that $(x~d_1~\cdots~d_n)$ is strongly normalizing. But this must be true, because in any reduction sequence, all redexes remain inside the $d_i$, which are strongly normalizing by assumption.
+
+For the case of applications $(e_1~e_2)$, the left-hand premise is $\judge{\Gamma,\,\Delta}{(e_1~e_2)}{\tau}$. This must have been derived from an application of the typing rule for applications
+\begin{align*}
+\AxiomC{$\judge{\Gamma,\,\Delta}{e_1}{\sigma\to\tau}$}
+\AxiomC{$\judge{\Gamma,\,\Delta}{e_2}{\sigma}$}
+\BinaryInfC{$\judge{\Gamma,\,\Delta}{(e_1~e_2)}\tau$}
+\DisplayProof
+\end{align*}
+for some type $\sigma$. By the induction hypothesis and Lemma \ref{lem:USNapp}, we have
+\begin{align*}
+\AxiomC{$\judge{\Gamma,\,\Delta}{e_1}{\sigma\to\tau}$}
+\AxiomC{$\judgeUSN{\Gamma}{\delta}{\Delta}$}
+\BinaryInfC{$\judgeUSN{\Gamma}{\osubst{e_1}\delta}{\sigma\to\tau}$}
+\AxiomC{$\judge{\Gamma,\,\Delta}{e_2}{\sigma}$}
+\AxiomC{$\judgeUSN{\Gamma}{\delta}{\Delta}$}
+\BinaryInfC{$\judgeUSN{\Gamma}{\osubst{e_2}\delta}\sigma$}
+\BinaryInfC{$\judgeUSN{\Gamma}{(\osubst{e_1}\delta~\osubst{e_2}\delta)}\tau$}
+\DisplayProof
+\end{align*}
+and the conclusion is equivalent to the desired result $\judgeUSN{\Gamma}{\osubst{(e_1~e_2)}\delta}\tau$.
+
+Finally, for the case of $\lambda$-abstractions $\lam xe$, assume without loss of generality that the term has been $\alpha$-converted with a fresh variable $x$. Suppose $\tau=\sigma_1\to\rho$ and $\rho=\sigma_2\to\cdots\to\sigma_n\to\alpha$. It must be the case that $n\geq 1$, because the term is a $\lambda$-abstraction. The premise must have been derived from an application of the typing rule for abstractions:
+\begin{align*}
+\AxiomC{$\judge{\Gamma,\,\Delta,\,\type x{\sigma_1}}{e}{\rho}$}
+\UnaryInfC{$\judge{\Gamma,\,\Delta}{\lam xe}{\sigma_1\to\rho}$}
+\DisplayProof
+\end{align*}
+By the induction hypothesis, we have the two rules
+\begin{align}
+&
+\AxiomC{$\judge{\Gamma,\,\Delta,\,\type x{\sigma_1}}{e}{\rho}$}
+\AxiomC{$\judgeUSN{\Gamma}{\delta}{\Delta}$}
+\BinaryInfC{$\judgeUSN{\Gamma,\,\type x{\sigma_1}}{\osubst{e}\delta}{\rho}$}
+\DisplayProof
+&&
+\AxiomC{$\judge{\Gamma,\,\Delta,\,\type x{\sigma_1}}{e}{\rho}$}
+\AxiomC{$\judgeUSN{\Gamma}{\delta}{\Delta}$}
+\AxiomC{$\judgeUSN\Gamma{d_1}{\sigma_1}$}
+\TernaryInfC{$\judgeUSN{\Gamma}{\subst{\osubst{e}\delta}{d_1}x}{\rho}$}
+\DisplayProof
+\label{eq:USNtworules}
+\end{align}
+%\begin{gather*}
+%\AxiomC{$\judge{\Gamma,\,\Delta,\,\type x{\sigma_1}}{e}{\rho}$}
+%\AxiomC{$\judgeUSN{\Gamma}{\delta}{\Delta}$}
+%\BinaryInfC{$\judgeUSN{\Gamma,\,\type x{\sigma_1}}{\osubst{e}\delta}{\rho}$}
+%\DisplayProof\\[1em]
+%\AxiomC{$\judge{\Gamma,\,\Delta,\,\type x{\sigma_1}}{e}{\rho}$}
+%\AxiomC{$\judgeUSN{\Gamma}{\delta}{\Delta}$}
+%\AxiomC{$\judgeUSN\Gamma{d_1}{\sigma_1}$}
+%\TernaryInfC{$\judgeUSN{\Gamma}{\subst{\osubst{e}\delta}{d_1}x}{\rho}$}
+%\DisplayProof
+%\end{gather*}
+%\begin{align*}
+%\AxiomC{$\judge{\Gamma,\,\Delta,\,\type x\sigma}{e}{\rho}$}
+%\AxiomC{$\judgeUSN{\Gamma}{\delta}{\Delta}$}
+%\BinaryInfC{$\judgeUSN{\Gamma,\,\type x\sigma}{\osubst{e}\delta}{\rho}$}
+%\UnaryInfC{$\judge{\Gamma}{\lam x{(\osubst{e}\delta)}}{\sigma\to\rho}$}
+%\DisplayProof
+%\end{align*}
+We would like to conclude that $\judgeUSN{\Gamma}{\osubst{\lam xe}\delta}{\sigma_1\to\rho}$.\footnote{As $\osubst{(\lam xe)}\delta=\lam x{(\osubst e\delta)}$, we simply write $\lam x{\osubst e\delta}$.} The typing $\judge{\Gamma}{\lam x{\osubst e\delta}}{\sigma_1\to\rho}$ follows from the conclusion of the left-hand rule of \eqref{eq:USNtworules} by the abstraction rule. This gives part (A) of Definition \ref{def:USN}.
+
+For part (B), let $\judgeUSN\Gamma{d_i}{\sigma_i}$ for $1\leq i\leq n$. We wish to show that $((\lam x{\osubst e\delta})~d_1~\cdots~d_n)$ is strongly normalizing. We know that $\lam x{\osubst e\delta}$ is strongly normalizing by the conclusion of the left-hand rule of \eqref{eq:USNtworules}, and the $d_i$ are strongly normalizing by assumption. Thus a head reduction
+\begin{align*}
+(\lam x{\osubst e\delta'})~d_1'~\cdots~d_n'\ &\to\ \subst{\osubst e\delta'}{d_1'}x~d_2'~\cdots~d_n'
+\end{align*}
+must eventually be performed after any sufficiently long sequence of reductions $\lam x{\osubst e\delta} \goesto*{} \lam x{\osubst e\delta'}$ and $d_i \goesto*{} d_i'$, $1\leq i\leq n$.
+But we might have done the head reduction $(\lam x{\osubst e\delta})~d_1 \to \subst{\osubst e\delta}{d_1}x$ in the very first step, and $\subst{\osubst e\delta'}{d_1'}x$ is still derivable from this by reducing the same redexes as in $\osubst e\delta\goesto*{}\osubst e\delta'$ and $d_1\goesto*{}d_1'$. Thus
+\begin{align*}
+(\lam x{\osubst e\delta})~d_1~\cdots~d_n\ &\to\ \subst{\osubst e\delta}{d_1}x~d_2~\cdots~d_n\ \stackrel *\to\ \subst{\osubst e\delta'}{d_1'}x~d_2'~\cdots~d_n'.
+\end{align*}
+But $(\subst{\osubst e\delta}{d_1}x~d_2~\cdots~d_n)$ is strongly normalizing by the conclusion of the right-hand rule of \eqref{eq:USNtworules}, therefore $(\subst{\osubst e\delta'}{d_1'}x~d_2'~\cdots~d_n')$ must be as well.
+\end{proof}
+
+\begin{proofof}{Theorem \ref{thm:SN}}
+Take $\Delta$ and $\delta$ empty in Lemma \ref{lem:SN}.
+\end{proofof}
+
+\section{Discussion}
+
+The technique uaed here is a variant of a technique called \emph{logical relations}. This technique generalizes to more expressive languages. We will shortly see extensions of the $\lambda$-calculus that can be used to write more interesting computations, yet can be proved strongly normalizing with the same technique.
+
+There are many situations in which it is useful to have a language in which all programs terminate. For example, operating systems and web browsers are often extended with plug-in software that is not fully trusted. Knowing that the plug-in code cannot cause an infinite loop is useful (though we probably want an even tighter bound on run time). Also, we will later see type systems with type expressions isomorphic to the $\lambda$-calculus (parameterized types). Because evaluation in the type language terminates, the type checker also terminates, which is useful to know.

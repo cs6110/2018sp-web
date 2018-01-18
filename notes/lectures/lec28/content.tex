@@ -1,0 +1,156 @@
+\handout{28}
+\title{Propositions as Types}
+\date{20 April 2016}
+\maketitle
+
+\section{Intuitionistic Logic and Constructive Mathematics}
+
+We have previously observed that several familiar type judgments $\judge{}e\tau$ of the pure simply-typed $\lambda$-calculus correspond to a tautologies of propositional logic:
+\[
+\begin{array}{cc}
+\mbox{\textit{type judgment}} & \mbox{\textit{propositional tautology}}\\[2pt]\hline\\[-8pt]
+\judge{}{I}{\alpha\to\alpha} & P\to P\\
+\judge{}{K}{\alpha\to\beta\to\alpha} & P\to (Q\to P)\\
+\judge{}{S}{(\alpha\to\beta\to\gamma)\to(\alpha\to\beta)\to(\alpha\to\gamma)} & (P\to Q\to R)\to(P\to Q)\to(P\to R)\\
+\end{array}
+\]
+This is no accident.  It turns out that all derivable type judgments $\judge{}e\tau$ (with the empty environment to the left of the turnstile) give propositional tautologies.  This is because the typing rules of $\lambda^\rightarrow$ correspond exactly to the proof rules of propositional _intuitionistic logic_.
+
+Intuitionistic logic is the basis of _constructive mathematics_.  Constructive mathematics takes a much more conservative view of truth than classical mathematics.  It is concerned less with _truth_ than with _provability_.  Two of its main proponents were Kronecker and Brouwer.  These views generated great controversy in the mathematical world when they first appeared.
+
+In constructive mathematics, not all deductions of classical logic are considered valid.  For example, to prove in classical logic that there exists an object having a certain property, it is enough to assume that no such object exists and derive a contradiction.  Intuitionists would not consider this argument valid.  Intuitionistically, you must actually construct the object and prove that it has the desired property.
+
+Intuitionists do not accept the law of double negation: $P\leftrightarrow \neg\neg P$.  They do believe that $P\to\neg\neg P$, that is, if $P$ is true then it is not false; but they do not believe $\neg\neg P\to P$, that is, even if $P$ is not false, then that does not automatically make it true.
+
+Similarly, intuitionists do not accept the law of the excluded middle $P\vee\neg P$.  In order to prove $P\vee\neg P$, you must prove either $P$ or $\neg P$.  It may well be that neither is provable, in which case the intuitionist would not accept that $P\vee\neg P$.
+
+For intuitionists, the implication $P\to Q$ has a much stronger meaning than merely $\neg P\vee Q$, as in classical logic.  To prove $P\to Q$, one must show how to construct a proof of $Q$ from any given proof of $P$.  So a proof of $P\to Q$ is a (computable) function from proofs of $P$ to proofs of $Q$.  Similarly, to prove $P\wedge Q$, you must prove both $P$ and $Q$; thus a proof of $P\wedge Q$ is a pair consisting of a proof of $P$ and a proof of $Q$.
+
+\subsection{Example}
+
+Here is an example of a proof that would not be accepted by an intuitionist.
+
+\medskip\noindent
+\textbf{Theorem}\quad
+There exist irrational numbers $a$ and $b$ such that $a^b$ is rational.
+
+\begin{proof}
+Either $\sqrt 2^{\sqrt 2}$ is rational or not.  If it is, take $a=b=\sqrt 2$ and we are done.  If it is not, take $a=\sqrt 2^{\sqrt 2}$ and $b=\sqrt 2$; then $a^b=(\sqrt 2^{\sqrt 2})^{\sqrt 2}=\sqrt 2^2=2$, and again we are done.
+\end{proof}
+
+Now an intuitionist would not like this, because we have not constructed a definite $a$ and $b$ with the desired property.  We have used the law of the excluded middle, which the intuitionist would regard as cheating.\footnote{It is possible to give a constructive proof using only elementary facts. Hint: consider $\sqrt 2^{\log_2 9}$.}
+
+\section{Syntax}
+
+Syntactically, formulas $\phi,\psi,\ldots$ of intuitionistic logic look the same as their classical counterparts.  At the propositional level, we have propositional variables $P,Q,R,\ldots$ and formulas
+\(
+\phi &::=& \top \bnf \bot \bnf P \bnf \phi\to\psi \bnf \phi\vee\psi \bnf \phi\wedge\psi \bnf \neg\phi.
+\)
+We might also add a second-order quantifier $\forall P$ ranging over propositions:
+\(
+\phi &::=& \cdots \bnf \fa P\phi.
+\)
+
+\section{Natural Deduction (Gentzen, 1943)}
+
+Intuitionistic logic uses a sequent calculus to derive the truth of formulas.  Assertions are judgments of the form $\seq\phi 1n\force\phi$, which means that $\phi$ can be derived from the assumptions $\seq\phi 1n$. If $\force\phi$ without assumptions, then $\phi$ is a theorem of intuitionistic logic.  The system is called _natural deduction_.
+
+As we write down the proof rules, it will be clear that they correspond exactly to the typing rules of the pure simply-typed $\lambda$-calculus $\lambda^\to$ (and with quantifiers, System F).  We will show them side by side.  There are generally _introduction_ and _elimination_ rules for each operator.
+\[
+\begin{array}{ccc}
+& \mbox{\textit{intuitionistic logic}} & \mbox{\textit{$\lambda^\to$ or System F type system}}\\ \hline\\
+\mbox{(axiom)} & \Gamma,\,\phi\force\phi & \judge{\Gamma,\,x:\tau}x\tau\\[1em]
+\mbox{($\to$-intro)}
+& \dfrac{\Gamma,\,\phi\force\psi}{\Gamma\force\phi\to\psi}
+& \dfrac{\judge{\Gamma,\,x:\sigma}e\tau}{\judge\Gamma{(\lam{x:\sigma}e)}{\sigma\to\tau}}\\[1em]
+\mbox{($\to$-elim)}
+& \dfrac{\Gamma\force\phi\to\psi \quad \Gamma\force\phi}{\Gamma\force\psi}
+& \dfrac{\judge\Gamma{e_0}{\sigma\to\tau} \quad \judge\Gamma{e_1}\sigma}{\judge\Gamma{(e_0~e_1)}\tau}\\[1em]
+\mbox{($\wedge$-intro)}
+& \dfrac{\Gamma\force\phi\quad\Gamma\force\psi}{\Gamma\force\phi\wedge\psi}
+& \dfrac{\judge\Gamma{e_1}\sigma\quad\judge\Gamma{e_2}\tau}{\judge\Gamma{(e_1,e_2)}{\sigma*\tau}}\\[1em]
+\mbox{($\wedge$-elim)}
+& \dfrac{\Gamma\force\phi\wedge\psi}{\Gamma\force\phi}\quad\dfrac{\Gamma\force\phi\wedge\psi}{\Gamma\force\psi}
+& \dfrac{\judge\Gamma e{\sigma*\tau}}{\judge\Gamma{\#1\,e}\sigma}\quad\dfrac{\judge\Gamma e{\sigma*\tau}}{\judge\Gamma{\#2\,e}\tau}\\[1em]
+\mbox{($\vee$-intro)}
+& \dfrac{\Gamma\force\phi}{\Gamma\force\phi\vee\psi} \quad \dfrac{\Gamma\force\psi}{\Gamma\force\phi\vee\psi}
+& \dfrac{\judge\Gamma e\sigma}{\judge\Gamma{"inl"_{\sigma+\tau}}e{\sigma+\tau}} \quad \dfrac{\judge\Gamma e\tau}{\judge\Gamma{"inr"_{\sigma+\tau}}e{\sigma+\tau}}\\[1em]
+\mbox{($\vee$-elim)}
+& \dfrac{\Gamma\force\phi\vee\psi\quad\Gamma\force\phi\to\chi\quad\Gamma\force\psi\to\chi}{\Gamma\force\chi}
+& \dfrac{\judge\Gamma e{\sigma+\tau} \quad \judge\Gamma{e_1}{\sigma\arrow\rho} \quad \judge\Gamma{e_2}{\tau\arrow\rho}}{\judge\Gamma{"case"~e_0~"of"~e_1~|~e_2}\rho}\\[1em]
+\mbox{($\forall$-intro)}
+& \dfrac{\Gamma,\,P\force\phi}{\Gamma\force\fa P\phi}
+& \dfrac
+{\Judge{\Delta,\,\alpha}\Gamma e\tau \quad \alpha\notin\FV\Gamma}
+{\Judge\Delta\Gamma{(\Lam\alpha e)}{\fa\alpha\tau}}\\[1em]
+\mbox{($\forall$-elim)}
+& \dfrac{\Gamma\force\fa P\phi}{\Gamma\force\subst\phi\psi P}
+& \dfrac
+{\Judge\Delta\Gamma e{\fa\alpha\tau} \quad \Delta\force\sigma}
+{\Judge\Delta\Gamma{(e~\sigma)}{\subst\tau\sigma\alpha}}
+\end{array}
+\]
+The $\to$-elimination rule is often called _modus ponens_.
+
+\section{The Brouwer--Heyting--Kolmogorov (BHK) Principle}
+
+The fact that propositions in intuitionistic logic correspond to types in our $\lambda$-calculus type systems is known as the _Brouwer--Heyting--Kolmogorov_ (BKH) interpretation or _propositions as types_ principle, and sometimes the _Curry--Howard isomorphism_ (although neither is it due to Curry and Howard nor is it an isomorphism).  The analogy is far reaching:
+\begin{center}
+\begin{tabular}{ll@{\qquad\qquad}ll}
+\multicolumn 2 c{\textit{type theory}} & \multicolumn 2 c{\textit{logic}}\\ \hline
+$\tau$ & type & $\phi$ & proposition\\
+$\tau$ & inhabited type & $\phi$ & theorem\\
+$e$ & well-typed program & $\pi$ & proof\\
+$\to$ & function space & $\to$ & implication\\
+* & product & $\wedge$ & conjunction\\
++ & sum & $\vee$ & disjunction\\
+$\forall$ & type quantifier & $\forall$ & second-order quantifier\\
+1 & unit & $\top$ & truth\\
+0 & void & $\bot$ & falsity
+\end{tabular}
+\end{center}
+A proof in intuitionistic logic is a construction, which is essentially a program ($\lambda$-term).  Saying that a proposition has an intuitionistic or constructive proof says essentially that the corresponding type is inhabited by a $\lambda$-term.
+
+If we are given a well-typed term in System F or $\lambda^{\arrow}$, then
+its proof tree will look exactly like the proof tree for the corresponding
+formula in intuitionistic logic.  This means that every well-typed program proves something,
+that is, it is a proof in constructive logic.  Conversely, every theorem in constructive
+logic corresponds to an inhabited type.  Several automated deduction systems (for example, Nuprl and Coq) are based on this idea.
+
+\section{Theorem Proving and Type Checking}
+
+We have seen that _type inference_ is the process of inferring a type for a given $\lambda$-term.  Under the propositions-as-types principle, this is the same as determining what theorem a given proof proves.  Theorem proving, on the other hand, is going in the opposite direction: Given a formula, does it have a proof?  Equivalently, given a type, is it inhabited?
+
+For example, consider the formula expressing transitivity of implication:
+\[
+\forall P,Q,R\,.~((P\to Q) \wedge (Q \to R))\ \to\ ( P \to R)
+\]
+Under the propositions-as-types principle, this is related to the type
+\[
+\forall\alpha,\beta,\gamma\,.~(\alpha\to\beta)*(\beta\to\gamma)\ \to\ (\alpha\to\gamma).
+\]
+If we can construct a term of this type, we will have proved the theorem in
+intuitionistic logic.  The program
+\[
+\Lam{\alpha,\beta,\gamma}{\lam {p:(\alpha\to\beta)*(\beta\to\gamma)}{\lam{x:\alpha}{(\#2\,p)~((\#1\,p)~x)}}}
+\]
+does it.  This is a function that takes a pair of functions as its
+argument and returns their composition.
+The proof tree that establishes the typing of this function
+is essentially an intuitionistic proof of the transitivity of implication.
+
+Here is another example.  Consider the formula
+\[
+\forall P,Q,R\,.~(P\wedge Q\to R)\ \leftrightarrow\ (P\to Q\to R)
+\]
+The double implication $\leftrightarrow$ is an abbreviation for the conjunction
+of the implications in both directions.  It says that the two formulas on either side
+are propositionally equivalent.  The typed expressions corresponding to each side
+of the formula above are
+\(
+\alpha*\beta\to\gamma &\qquad& \alpha\to\beta\to\gamma.
+\)
+We know that any term of the first type can be converted to one
+of the second by _currying_, and we can go in the opposite direction
+by _uncurrying_.  The two $\lambda$-terms that convert a function to its
+curried form and back constitute a proof of the logical statement.

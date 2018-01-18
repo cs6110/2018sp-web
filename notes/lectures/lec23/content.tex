@@ -1,0 +1,184 @@
+\lecture{23}
+\title{Type Inference and Unification}
+\date{15 April 2016}
+\maketitle
+
+\section{Type Inference}
+
+_Type inference_ refers to the process of determining the appropriate types for expressions based on how they are used. For example, OCaml knows that in the expression "(f 3)", "f" must be a function (because it is applied to something, not because its name is "f"!) and that it takes an "int" as input. It knows nothing about the output type. Therefore the type inference mechanism of OCaml would assign "f" the type \texttt{int -> 'a}.
+\begin{code}
+\tt
+\# fun f -> f 3;;
+- : (int -> 'a) -> 'a = <fun>
+\end{code}
+
+There may be many different occurrences of a symbol in an expression, all leading to different typing constraints, and these constraints must have a common solution, otherwise the expression cannot be typed.
+\begin{code}
+\tt
+\# fun f -> f (f 3);;
+- : (int -> int) -> int = <fun>
+\# fun f -> f (f "hi");;
+- : (string -> string) -> string = <fun>
+\# fun f -> f (f 3, f 4);;
+Error: This expression has type 'a * 'a
+    but an expression was expected of type int
+\end{code}
+In the first example, how does it know that the output type of "f" is "int"? Because the input type of "f" is "int", and the output of "f" is fed into "f" again, so the output type of "f" has to be the same as the input type of "f".
+
+If a program is well-typed, then a type can be inferred. For example, consider the program
+\begin{tabbing}
+\hspace{1em}\=\hspace{1em}\=\hspace{1em}\=\hspace{1em}\=\hspace{1em}\=\hspace{1em}\=\kill
+$\letin{\mathit{square}}{\lam z{z*z}}{}$\\
+\>$\lam f{\lam x{\lam y{}}}$\\
+\>\>$"if"~(f~x~y)$\\
+\>\>\>$"then"~(f~(\mathit{square}~x)~y)$\\
+\>\>\>$"else"~(f~x~(f~x~y))$
+\end{tabbing}
+We are applying the multiplication operator to $z$, therefore we must have $z:"int"$, thus $\lam z{z*z}:"int"\to"int"$ and $\mathit{square}:"int"\to"int"$. We know that the type of $f$ must be something of the form $f:\sigma\to\tau\to"bool"$ for some $\sigma$ and $\tau$, since it is applied to two arguments and its return value is used in a conditional test. Since $f$ is applied to the value of $\mathit{square}~x$ as its first argument, it must be that $\sigma="int"$. 
+Since $f$ is applied to the value of $f~x~y$ as its second argument, it must be that $\tau="bool"$.
+Thus $f$ must be of type $"int"\to"bool"\to"bool"$, $x$ must be of type "int", and $y$ must be of type "bool". The value of the program is a function that takes inputs $f$, $x$, and $y$, and returns a "bool". Thus the type of the entire program is $("int"\to"bool"\to"bool")\to"int"\to"bool"\to"bool"$.
+
+\section{Unification}
+
+Both type inference and pattern matching in OCaml are instances of a very general mechanism called _unification_. Briefly, unification is the process of finding a substitution that makes two given terms equal. Pattern matching in OCaml is done by applying unification to OCaml expressions, whereas type inference is done by applying unification to type expressions. It is interesting that both these procedures turn out to be applications of the same general mechanism. There are many other applications of unification in computer science; for example, the programming language Prolog is based on it.
+
+Let us write $sS$ for the result of applying a substitution $S$ to the term $s$. For example,
+\begin{align*}
+\substtwo{f(x,h(x,y))}{g(y)}xzy\ &=\ f(g(y),h(g(y),z)),
+\end{align*}
+where the substitution operator $\substtwo{}{g(y)}xzy$ applied to a term simultaneously substitutes $g(y)$ for $x$ and $z$ for $y$. The substitution is simultaneous, not sequential. In this example, sequential substitution gives a different result:
+\begin{align*}
+\subst{\subst{f(x,h(x,y))}{g(y)}x}zy\ &=\ \subst{f(g(y),h(g(y),y))}zy\ =\ f(g(z),h(g(z),z)).
+\end{align*}
+
+The essential task of unification is to find a substitution $S$ that \emph{unifies} two given terms (makes them equal). Thus, given $s$ and $t$, we want to find $S$ such that $s S = t S$. Such a substitution $S$ is called a _unifier_ for $s$ and $t$. For example, given the terms
+\begin{align}
+& f(x,g(y)) && f(g(z),w)\label{eqn:unif1}
+\end{align}
+the substitution
+\begin{align}
+S\ &=\ \substtwo{}{g(z)}x{g(y)}w\label{eqn:substS}
+\end{align}
+would be a unifier, since 
+\begin{align*}
+\substtwo{f(x,g(y))}{g(z)}x{g(y)}w\ &=\ \substtwo{f(g(z),w)}{g(z)}x{g(y)}w\ =\ f(g(z),g(y)).
+\end{align*}
+Note that this is a purely syntactic definition; the meaning of expressions is not taken into consideration when computing unifiers.
+
+Unifiers do not necessarily exist. For example, the terms $x$ and $f(x)$ cannot be unified, since no substitution for $x$ can make the two terms equal.
+
+Even when unifiers exist, they are not necessarily unique. For example, the substitution
+\begin{align*}
+T\ &=\ \{g(f(a,b))/x,\,f(b,a)/y,\,f(a,b)/z,\,g(f(b,a))/w\}
+\end{align*}
+is also a unifier for the two terms (\ref{eqn:unif1}):
+\begin{align*}
+f(x,g(y))\,T\ &=\ f(g(z),w)\,T\ =\ f(g(f(a,b)),g(f(b,a))).
+\end{align*}
+However, when a unifier exists, there is always a _most general unifier_ (mgu) that is unique up to renaming. A unifier $S$ for $s$ and $t$ is a most general unifier (mgu) for $s$ and $t$ if
+\begin{itemize}
+\item
+$S$ is a unifier for $s$ and $t$,
+\item
+any other unifier $T$ for $s$ and $t$ is a _refinement_ of $S$; that is, $T$ can be obtained from $S$ by doing further substitutions.
+\end{itemize}
+
+For example, the substitution $S$ in the example above is an mgu for $f(x,g(y))$ and $f(g(z),w)$. The unifier $T$ is a refinement of $S$, since $T = S\,U$, where
+\begin{align*}
+U\ &=\ \substtwo{}{f(a,b)}z{f(b,a)}y.
+\end{align*}
+Note that
+\begin{align*}
+f(x,g(y))\,S\,U\ &=\ \substtwo{\substtwo{f(x,g(y))}{g(z)}x{g(y)}w}{f(a,b)}z{f(b,a)}y\\
+&=\ \substtwo{f(g(z),g(y))}{f(a,b)}z{f(b,a)}y\\
+&=\ f(g(f(a,b)),g(f(b,a)))\\
+&=\ f(x,g(y))\,T.
+\end{align*}
+
+We can compose substitutions, as we did with $S\,U$. This is the substitution that first applies $S$, then applies $U$ to the result. The composition is also a substitution.
+
+\section{Unification Algorithm}
+
+The unification algorithm is known as Robinson's algorithm (1965). We need unification for not just for a pair of terms, but more generally, for a set of pairs of terms. We say that a substitution $S$ is a _unifier_ for a set of pairs $\{(s_1,t_1),\ldots,(s_n,t_n)\}$ if $s_iS = t_iS$ for all $1\leq i\leq n$.
+
+The unification algorithm is given in terms of a function $\Unifyname$ that takes a set of (unordered) pairs of terms $(s,t)$ and produces their mgu, if it exists. If $E$ is a set of pairs of terms, then $\subst Etx$ denotes the result of applying the substitution $\subst{}tx$ to all the terms in $E$.
+\begin{itemize}
+\item
+$\Unify{\{(x,t)\}\cup E}\ \definedas\ \subst{}tx\,\Unify{\subst Etx}$ if $x\notin\FV t$
+\item
+$\Unify\emptyset\ \definedas\ I$ (the identity substitution $x\mapsto x$)
+\item
+$\Unify{\{(x,x)\}\cup E}\ \definedas\ \Unify E$
+\item
+$\Unify{\{(f(\seq s1n),f(\seq t1n))\}\cup E}\ \definedas\ \Unify{\{(s_1,t_1),\ldots,(s_n,t_n)\}\cup E}$.
+\end{itemize}
+In the first rule, $\subst{}tx$ denotes the substitution that substitutes $t$ for $x$,
+and $\subst{}tx\,\Unify{\subst Etx}$ denotes the composition of $\subst{}tx$ and $\Unify{\subst Etx}$. Since we write substitutions on the right, we follow the convention that composition is from left to right; thus $S\,T$ means, ``do $S$, then do $T$''.
+
+The algorithm will fail if it ever encounters a pair $(x,t)$ such that $x\neq t$ but $x$ occurs in $t$ or a pair $(f(\seq s1m),g(\seq t1n))$ such that $f\neq g$. In either case, no substitution can unify the two terms.
+
+\section{Type Inference and Unification}
+
+Now we show how to do type inference using unification on type expressions. This technique gives the most general type (mgt) of any typable term; any other type of this term is a substitution instance of its most general type. Recall the Curry-style simply typed $\lambda$-calculus with syntax
+\begin{align*}
+& e\ ::=\ x \bnf e_1\,e_2 \bnf \lam xe && \tau\ ::=\ \alpha \bnf \tau_1\to\tau_2
+\end{align*}
+and typing rules
+\begin{align*}
+& \judge{\Gamma,\,\type x\tau}{x}{\tau}
+&& \frac{\judge\Gamma{e_1}{\sigma\to\tau}\qquad\judge\Gamma{e_2}\sigma}{\judge\Gamma{(e_1\,e_2)}\tau}
+&& \frac{\judge{\Gamma,\,x:\sigma}e\tau}{\judge\Gamma{\lam xe}{\sigma\to\tau}}.
+\end{align*}
+For the language of types, the last unification rule translates to
+\begin{itemize}
+\item
+$\Unify{\{(s\to s',t\to t')\}\cup E}\ \definedas\ \Unify{\{(s,t),(s',t')\}\cup E}$.
+\end{itemize}
+
+The problem is that any type derivation starts with assumptions about the types of the variables in the form of a type environment $\Gamma$, but without a type environment or an annotation as in Church style, we do not know what these are. However, we can observe that the form of the subterms impose constraints on the types. We can write down these constraints and then try to solve them.
+
+Suppose we want to infer the type of a given $\lambda$-term $e$. Without loss of generality, suppose we have $\alpha$-converted $e$ so that no variable is bound more than once and no variable with a binding occurrence $\lambda x$ also occurs free.\footnote{This assumption is known as the \emph{Barendregt variable convention} after Henk Barendregt.}
+
+Let $\seq e1m$ be an enumeration of all _occurrences_ of subterms of $e$. We first assign a unique type variable $\alpha_i$ to each $e_i$, $1\leq i\leq m$, as well as a unique type variable $\beta_x$ to each variable $x$. Then we take the following constraints:
+\begin{itemize}
+\item
+if $e_i$ is an occurrence of a variable $x$, the constraint $\alpha_i = \beta_x$;
+\item
+if $e_i$ is an occurrence of an application $e_j\,e_k$, the constraint $\alpha_j = \alpha_k\to\alpha_i$; and
+\item
+if $e_i$ is an occurrence of an abstraction $\lam x{e_j}$, the constraint $\alpha_i = \beta_x\to\alpha_j$.
+\end{itemize}
+
+This gives us a list of pairs $(\sigma,\tau)$ of type expressions representing type constraints $\sigma=\tau$ imposed by the typing rules above.
+
+Now we do unification on the constraints and apply the resulting substitution to the type variable $\alpha_e$. The result is the mgu of $e$.
+
+\subsection{An Example}
+
+Here is an example of the algorithm applied to the combinator $S = \lam{xyz}{xz(yz)}$. Let us mark the second occurrence of $z$ as $z'$ to distinguish it from the first occurrence, although they are occurrences of the same variable $z$. Each occurrence of a subterm generates a constraint:
+\begin{align*}
+e_1\ &=\ \lam x{\lam y{\lam z{xz(yz')}}} && \alpha_1=\beta_x\to\alpha_2\\
+e_2\ &=\ \lam y{\lam z{xz(yz')}} && \alpha_2=\beta_y\to\alpha_3\\
+e_3\ &=\ \lam z{xz(yz')} && \alpha_3=\beta_z\to\alpha_4\\
+e_4\ &=\ xz(yz') && \alpha_5=\alpha_8\to\alpha_4\\
+e_5\ &=\ xz && \alpha_6=\alpha_7\to\alpha_5\\
+e_6\ &=\ x && \alpha_6=\beta_x\\
+e_7\ &=\ z && \alpha_7=\beta_z\\
+e_8\ &=\ yz' && \alpha_9=\alpha_{10}\to\alpha_8\\
+e_9\ &=\ y && \alpha_9=\beta_y\\
+e_{10}\ &=\ z' && \alpha_{10}=\beta_z.
+\end{align*}
+Solving these constraints using Robinson's algorithm yields
+\begin{align*}
+\alpha_1\ &=\ (\alpha_7\to\alpha_8\to\alpha_4)\to(\alpha_7\to\alpha_8)\to\alpha_7\to\alpha_4\\
+\alpha_2\ &=\ (\alpha_7\to\alpha_8)\to\alpha_7\to\alpha_4\\
+\alpha_3\ &=\ \alpha_7\to\alpha_4\\
+\alpha_5\ &=\ \alpha_8\to\alpha_4\\
+\alpha_6\ &=\ \alpha_7\to\alpha_8\to\alpha_4\\
+\alpha_9\ &=\ \alpha_7\to\alpha_8\\
+\alpha_{10}\ &=\ \alpha_7\\
+\beta_x\ &=\ \alpha_7\to\alpha_8\to\alpha_4\\
+\beta_y\ &=\ \alpha_7\to\alpha_8\\
+\beta_z\ &=\ \alpha_7
+\end{align*}
+so we see that the most general type of $e_1$ is $(\alpha_7\to\alpha_8\to\alpha_4)\to(\alpha_7\to\alpha_8)\to\alpha_7\to\alpha_4$.

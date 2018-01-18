@@ -1,0 +1,767 @@
+
+%%% Make sections usable for problems.
+
+\renewcommand\section{\@startsection {section}{1}{\z@}%
+{-3.5ex \@plus -1ex \@minus -.2ex}%
+{2.3ex \@plus.2ex}%
+{\flushleft\large\textsf}}
+
+\renewcommand\subsection{\@startsection {subsection}{1}{\z@}%
+{-3.5ex \@plus -1ex \@minus -.2ex}%
+{2.3ex \@plus.2ex}%
+{\flushleft\normalsize\textsf}}
+
+\renewcommand\subsubsection{\@startsection {subsubsection}{1}{\z@}%
+{-3.5ex \@plus -1ex \@minus -.2ex}%
+{2.3ex \@plus.2ex}%\
+{\flushleft\normalsize\textsf}}
+
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{(\alph{enumii})}
+%%% Set up for fullpage 8.5x11 paper
+\topmargin 0pt
+\advance \topmargin by -\headheight
+\advance \topmargin by -\headsep
+
+\textheight 8.9in
+
+\oddsidemargin 0pt
+\evensidemargin \oddsidemargin
+\marginparwidth 0.5in
+
+\textwidth 6.5in
+
+% moved to 6110.cls, changed to maketitle -- dk
+%%%% This puts in the header on homeworks (use instead of maketitle)
+%\newcommand\hwheader{
+%\begin{center}
+%{\large
+%\textsf{Cornell University\\
+%Computer Science 611 \\
+%Problem Set \homework}  \hfill \textsf{DUE: \due}}\\
+%\hrulefill
+%\end{center}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%font selection
+\newcommand\keyword[1]{\mbox{\upshape{\textsf{#1}}}}
+\newcommand\nm[1]{\mbox{\sl #1}}
+\newcommand\metafont[1]{\mbox{\textsl{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%annotated homework problems
+\newlength\oldleftmargini
+\newcounter{listdepth}
+\setcounter{listdepth}0
+\newcounter{romanizing}
+\newcommand\straightromanize{\setcounter{romanizing}1\def\theenumi{\roman{enumi}}%
+  \def\labelenumi{\emph{\textrm{(\theenumi)}}\kern.5em}}
+\newcommand\romanize{\setcounter{romanizing}1\def\theenumi{\roman{enumi}}%
+  \def\labelenumi{\textrm{(\theenumi)}\kern.5em}}
+\newcommand\romanizeii{\setcounter{romanizing}1\def\theenumii{\roman{enumii}}%
+  \def\labelenumii{\textrm{(\roman{enumii})}}}
+\newcommand\romanizeiii{\setcounter{romanizing}1\def\theenumiii{\roman{enumiii}}%
+  \def\labelenumiii{\textrm{(\roman{enumiii})}\kern.5em}}
+\newcommand\alphize{\def\theenumi{\alph{enumi}}\def\labelenumi{\textrm{(\theenumi)}}}
+\newcommand\alphizeii{\def\theenumii{\alph{enumii}}\def\labelenumii{\textrm{(\alph{enumii})}}}
+\newcommand\Alphize{\def\theenumi{\Alph{enumi}}\def\labelenumi{\textrm{(\theenumi)}}}
+\newcommand\Alphizeii{\def\theenumii{\Alph{enumii}}\def\labelenumii{\textrm{(\alph{enumii})}}}
+
+\newenvironment{aenumerate}{\oldleftmargini=\leftmargini\leftmargini=3ex\addtocounter{listdepth}1\setcounter{romanizing}0\begin{enumerate}\def\theenumi{\arabic{enumi}}\def\labelenumi{\theenumi.}\addtolength\itemsep{2mm}}{\end{enumerate}\setcounter{romanizing}0\def\theenumi{\arabic{enumi}}\def\labelenumi{\theenumi.}\addtocounter{listdepth}{-1}\leftmargini=\oldleftmargini}
+
+\newenvironment{aexercises}{\begin{aenumerate}\addtolength\itemsep{2mm}}{\end{aenumerate}}
+
+\newcommand\aitem[2][]{%
+\ifnum \value{listdepth} = 1%
+   \def\theenumi{\arabic{enumi}.}%
+   \refstepcounter{enumi}%
+   \label{#2-label}%
+   \addtocounter{enumi}{-1}%
+   \def\theenumi{\arabic{enumi}}%
+   \refstepcounter{enumi}%
+   \item[$^{\rm #1}$\labelenumi]%
+   \label{#2}%
+\else%
+   \ifnum \value{romanizing} = 0%
+      \def\theenumii{(\alph{enumii})}%
+   \else%
+      \def\theenumii{(\roman{enumii})}%
+   \fi%
+   \def\theenumi{}%
+   \refstepcounter{enumii}%
+   \label{#2-label}%
+   \addtocounter{enumii}{-1}%
+   \def\theenumi{\arabic{enumi}}%
+   \ifnum \value{romanizing} = 0%
+      \def\theenumii{(\alph{enumii})}% (8/13/05 - include parens)
+   \else%
+      \def\theenumii{(\roman{enumii})}% (8/13/05 - include parens)
+   \fi%
+   \refstepcounter{enumii}%
+   \item[$^{\rm #1}$\labelenumii]%
+   \label{#2}%
+\fi%
+}
+
+\newcommand\ritem[1]{\item[\ref{#1-label}]}%\kern.5em]}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Programming language macros
+
+\newcommand\bnf{\ensuremath{\ \ | \ \ }}
+\newcommand\sep\bnf
+\newcommand\sqleq{\ensuremath\sqsubseteq}
+
+%%% MACROS for typesetting names of program constructs
+%%% Syntactic objects are keywords in the syntax font
+\newcommand{\IF}{\keyword{if}}
+\newcommand{\THEN}{\keyword{then}}
+\newcommand{\ELSE}{\keyword{else}}
+\newcommand{\SKIP}{\keyword{skip}}
+\newcommand{\WHILE}{\keyword{while}}
+\newcommand{\DO}{\keyword{do}}
+\newcommand{\BREAK}{\keyword{break}}
+\newcommand{\UNTIL}{\keyword{until}}
+\newcommand{\TRUE}{\keyword{true}}
+\newcommand{\FALSE}{\keyword{false}}
+\newcommand{\FOR}{\keyword{for}}
+\newcommand{\TO}{\keyword{to}}
+\newcommand{\LEQ}{\keyword{leq}}
+\newcommand\AExp{\keyword{AExp}}
+\newcommand\BExp{\keyword{BExp}}
+\newcommand\Com{\keyword{Com}}
+\newcommand{\cond}[3]{\ensuremath{\IF \: #1 \:\THEN\: #2 \:\ELSE\: #3}}
+\newcommand{\while}[2]{\ensuremath{\WHILE \: #1 \:\DO\: #2}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% some Java specific macros
+\newcommand\javafnt\keyword
+\newcommand{\CLASS}{\javafnt{class}}
+\newcommand{\EXTENDS}{\javafnt{extends}}
+\newcommand{\RETURN}{\javafnt{return}}
+\newcommand{\INT}{\javafnt{int}}
+\newcommand{\BOOLEAN}{\javafnt{boolean}}
+\newcommand{\FLOAT}{\javafnt{float}}
+\newcommand{\IMPLEMENTS}{\javafnt{implements}}
+\newcommand{\PROTECTED}{\javafnt{protected}}
+\newcommand{\PUBLIC}{\javafnt{public}}
+\newcommand{\INTERFACE}{\javafnt{interface}}
+\newcommand{\ABSTRACT}{\javafnt{abstract}}
+\newcommand{\return}[1]{\RETURN \: #1}
+\newcommand{\jint}{\INT \: }
+\newcommand{\jfloat}{\FLOAT \:}
+\newcommand{\jbool}{\BOOLEAN \:}
+\newcommand{\jclass}[3]{
+\ensuremath{
+\begin{array}{l}
+\CLASS \: #1 \:\EXTENDS \: #2 \; \{\\
+\:\:\:\: #3 \\
+\}
+\end{array}
+}}
+\newcommand{\jaclass}[3]{
+\ensuremath{
+\begin{array}{l}
+\ABSTRACT \: \CLASS \: #1 \:\IMPLEMENTS \: #2 \; \{\\
+\:\:\:\: #3 \\
+\}
+\end{array}
+}}
+
+
+\newcommand{\jfunc}[2]{#1\: \{ #2 \}}
+\newcommand{\jinter}[2]{
+\ensuremath{
+\begin{array}{l}
+\INTERFACE \: #1 \; \{\\
+\:\:\:\: #2 \\
+\}
+\end{array}
+}}
+
+\newcommand{\jbclass}[2]{
+\ensuremath{
+\begin{array}{l}
+\CLASS \: #1 \; \{\\
+\:\:\:\: #2 \\
+\}
+\end{array}
+}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\T}[1]{\texttt{#1}}
+\newcommand{\caret}{\ensuremath{^\wedge}}
+
+%%% configurations, substitution
+\newcommand{\config}[2]{\ensuremath{\langle #1,\, #2 \rangle}}
+\newcommand{\configB}[4]{\ensuremath{\langle #1,\, #2,\, #3,\, #4 \rangle}}
+\newcommand{\stepsto}{\Downarrow}
+\newcommand{\stepsone}{\xrightarrow{1}}
+\newcommand{\stepstwo}{\xrightarrow{2}}
+\newcommand{\stepsthree}{\xrightarrow{3}}
+\newcommand\sub[1]{_{\mbox{\scriptsize #1}}}
+\newcommand\subst[3]{{\ensuremath #1\kern1pt\{#2/#3\}}}
+\newcommand\definedas{\mathrel{\stackrel{\scriptstyle\triangle}{=}}}
+\newcommand\Iffdef{\mathrel{\stackrel{\scriptstyle\triangle}{\Longleftrightarrow}}}
+\newcommand\translatesto{\;\;\longmapsto\;\;}
+\newcommand\fn{\ensuremath\lambda}
+
+%%% Some things useful for denotational semantics
+\newcommand\FVname{\nm{FV}}
+\newcommand\FV[1]{\FVname(#1)}
+
+%%% semantic brackets and related things
+%\newcommand\SB[2][]{\ensuremath{\mathcal{#1}[\kern-1.5pt[\kern1pt{#2}\kern1pt]\kern-1.5pt]}}
+\newcommand\SB[2][]{\ensuremath{\mathcal{#1}\llbracket\kern.5pt#2\kern1.2pt\rrbracket}}
+\newenvironment{SBE}{\left[\!\!\!\!\left[\begin{array}{c}}
+{\end{array}\right]\!\!\!\!\right]}
+\newcommand\bigSB[1]{\begin{SBE}#1\end{SBE}}
+\newcommand\Tr[2]{\ensuremath{{\cal #1}\SB{#2}}}
+%\newcommand\C[1]{{\cal C}\SB{#1}}
+\newcommand\C[1]{\Tr C{#1}}
+%\newcommand\Cr[1]{{\cal C}\SB{#1}\rho}
+\newcommand\Cr[1]{\C{#1}\rho}
+\newcommand\mathif[3]{\mathit{if}~#1~\mathit{then}~#2~\mathit{else}~#3}
+\newcommand\ini[1]{\nm{in}_{\mbox{\scriptsize{#1}}}}
+\newcommand\inj[2]{\nm{in}_{\mbox{\scriptsize\nm{#1}$\leftarrow$\nm{#2}}}}
+\newcommand\lm[3]{\lambda#1\in#2\,.\,#3}
+\newcommand\fnm[1]{\fbox{\sl #1}\,}
+%\newcommand{\Te}[1]{\ensuremath{\mathcal{T}\SB{#1}}} % "translation of"
+\newcommand\join{\ensuremath\bigsqcup}
+\newcommand\dq[1]{\mbox{``}#1\mbox{''}}
+\newcommand\sidecond[1]{\qquad\mbox{(#1)}}
+\newcommand\lift[1]{\ensuremath{\lfloor #1 \rfloor}}
+\newcommand{\Set}[1]{{\textbf{#1}}}
+\newcommand\dom{\mathop{\mathsf{dom}}}
+\newcommand{\Nat}{\naturals}
+\newcommand\mquote[1]{\textrm{``}#1\textrm{''}}
+
+%%% lambda abstraction
+\newcommand\lam[2]{\lambda#1\kern.5pt.\,#2}
+\newcommand\Lam[2]{\Lambda#1\kern.5pt.\,#2}
+\newcommand\arrow{\ensuremath\rightarrow}
+\newcommand{\ty}{\ensuremath{\kern-1pt:\kern-1pt}}
+\newcommand{\type}[2]{{#1}\kern-1pt:\kern-1pt{#2}}
+\newcommand{\proves}{\ensuremath{\vdash}}
+
+%\newcommand\Rule[3][]{\infer[#1]{#3}{#2}}
+\newcommand\Rule[3][]{
+\AxiomC{\ensuremath{#2}}
+\RightLabel{\ensuremath{#1}}
+\UnaryInfC{\ensuremath{#3}}
+\DisplayProof
+}
+\newcommand\RuleSide[3]{\infer[#3]{#2}{#1}}
+\newcommand\TernaryInfC\TrinaryInfC
+
+%%%%%%%%%%%%%
+% dk macros %
+%%%%%%%%%%%%%
+
+\renewcommand\emptyset\varnothing
+\newcommand{\inL}{\keyword{inL}}
+\newcommand{\inR}{\keyword{inR}}
+%\newcommand\caseof[3]{\keyword{case}~{#1}~\keyword{of}~{#2}\,|\,{#3}}
+%\newcommand\metacaseof[3]{\Mfont{case}~{#1}~\Mfont{of}~{#2}\,|\,{#3}}
+\newcommand\matchwith[3]{\keyword{match}~{#1}~\keyword{with}~{#2}\,|\,{#3}}
+\newcommand\metamatchwith[3]{\Mfont{match}~{#1}~\Mfont{with}~{#2}\,|\,{#3}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+
+\newcommand\Two{\mathbbm{2}}
+\newcommand\naturals{\mathbbm{N}}
+\newcommand\integers{\mathbbm{Z}}
+\newcommand\reals{\mathbbm{R}}
+\newcommand\unit{\mathbbm{U}}
+\newcommand\set[2]{\{#1\mathrel{|}#2\}}
+\newcommand\Imp\Rightarrow
+
+\newcommand{\Z}{\integers}
+\newcommand{\group}[1]{\left\langle{#1}\right\rangle}
+
+\newcommand\nondet{\left[\!\kern1pt\right]}
+\renewcommand\phi\varphi
+\renewcommand\wp[2]{\keyword{wp}~{#1}~{#2}}
+\newcommand\wlp[2]{\keyword{wlp}~{#1}~{#2}}
+\renewcommand\({\begin{eqnarray*}}
+\renewcommand\){\end{eqnarray*}}
+
+%\newcommand\LOOKUP[2]{\mathrm{lookup}~{#1}~{#2}}
+%\newcommand\UPDATE[3]{\mathrm{update}~{#1}~{#2}~{#3}}
+%\newcommand\MALLOC[2]{\mathrm{malloc}~{#1}~{#2}}
+\newcommand\p[2]{\langle{#1},\,{#2}\rangle}
+\newcommand\bigcdot{\mathrel{\raisebox{1pt}{$\scriptscriptstyle\bullet$}}}
+\newcommand\holed[1]{[\kern1pt#1\kern1pt]}
+\newcommand\hole{\holed{{\cdot}}}
+\newcommand\context[1]{E\kern1pt\holed{#1}}
+\newcommand\contextHole{\context\cdot}
+\newcommand\goesto[2]{\underset{#2}{\overset{#1}\to}}
+\newcommand\ifthenelse[3]{\mathsf{if\ }#1\mathsf{\ then\ }#2\mathsf{\ else\ }#3}
+\newcommand\IFTHENELSE{\keyword{if\hyphen then\hyphen else}}
+\newcommand\WHILEDO{\keyword{while\hyphen do}}
+\newcommand\DOUNTIL{\keyword{do\hyphen until}}
+\newcommand\ifpthenelse[3]{\mathsf{ifp\ }#1\mathsf{\ then\ }#2\mathsf{\ else\ }#3}
+\newcommand\whiledo[2]{\mathsf{while\ }#1\mathsf{\ do\ }#2}
+\newcommand\dountil[2]{\mathsf{do\ }#1\mathsf{\ until\ }#2}
+\newcommand\letin[3]{\mathsf{let\ }#1 = #2\mathsf{\ in\ }#3}
+\newcommand\letrec[5]{\mathsf{letrec\ }#1 = #2\mathsf{\ and\ \ldots\ and\ }#3 = #4\mathsf{\ in\ }#5}
+\newcommand\letrecone[3]{\mathsf{letrec\ }#1 = #2\mathsf{\ in\ }#3}
+\newcommand\true{\metafont{true}}
+\newcommand\false{\metafont{false}}
+\newcommand\error{\keyword{error}}
+\newcommand\states{\keyword{St}}
+\newcommand\PCA[3]{\{#1\}\kern1pt{#2}\kern1pt\{#3\}}
+\newcommand\rtc{^{\textstyle *}}
+\newcommand\sat\vDash
+\newcommand\force\vdash
+\newcommand\powerset[1]{2^{#1}}
+\newcommand\setcompl[1]{{\sim}{#1}}
+\newcommand\Iff\Leftrightarrow
+
+\newcommand\CC{\ensuremath{\mathcal C}}
+\newcommand\ff{f\kern-1ptf}
+
+\newcommand\hyphen{\mbox{-}}
+\newcommand\lookup[2]{\keyword{lookup}~#1~\mquote{#2}}
+\newcommand\update[3]{\keyword{update}~#1~#2~\mquote{#3}}
+\newcommand\malloc[2]{\keyword{malloc}~{#1}~{#2}}
+\newcommand\SBk[1]{\SBA{#1}k}
+\newcommand\fix[1]{\semanticsfont{fix}\,{#1}}
+\newcommand\parity[1]{\mathsf{parity}(#1)}
+\renewcommand\star{^*}
+
+\newlength\tl
+\setlength\tl{3cm}
+\newcommand\reasoning[1]{\def\longest{#1}\settowidth{\tl}{$\displaystyle\longest$}\addtolength{\tl}{5mm}}
+\newcommand\reason[2]{\makebox[\tl][l]{$\displaystyle{#1}$}\mbox{#2}}
+
+\renewcommand\inj[1]{\iota_{#1}}
+\newcommand\proj[1]{\pi_{#1}}
+\newcommand\dlt{\sqsubseteq}
+\newcommand\floor[1]{\lfloor{#1}\rfloor}
+\newcommand\cf[1]{[\kern1pt{#1}\kern1pt]}
+\newcommand\SBpr[1]{\SBB{#1}\phi\rho}
+%\renewcommand\C[3]{\Tr C{#1}\kern1pt{#2}\kern1pt{#3}}
+%\renewcommand\Cr[1]{\C{#1}\Gamma\rho}
+\newcommand\LIST{\keyword{list}}
+\newcommand\HEAD{\keyword{head}}
+\newcommand\TAIL{\keyword{tail}}
+\newcommand\NULL{\keyword{null}}
+\newcommand\EMPTY{\keyword{empty}}
+\newcommand\PAIR{\keyword{pair}}
+\newcommand\FIRST{\keyword{first}}
+\newcommand\SECOND{\keyword{second}}
+\newcommand\EQ{\keyword{eq}}
+\newcommand\ERROR{\keyword{error}}
+
+\newcommand\ujudge[2]{{#1}\force{#2}}
+\newcommand\judge[3]{{#1}\force\type{#2}{#3}}
+\newcommand\judgeeq[3]{{#1}\force{#2}={#3}}
+\newcommand\Gjudge[2]{\judge\Gamma{#1}{#2}}%
+\newcommand\forceUSN{\mathrel{\makebox[2pt][l]{$\force$}\raisebox{-3pt}[0pt][0pt]{\tiny{\textit{SN}}}}}
+\newcommand\judgeUSN[3]{{#1}\forceUSN{#2}:{#3}}
+\newcommand\Irred[1]{\semanticsfont{Irred}(#1)}
+\newcommand\Val{\semanticsfont{Val}}
+\newcommand\Var{\semanticsfont{Var}}
+\newcommand\FVar{\semanticsfont{FVar}}
+\newcommand\Type{\semanticsfont{Type}}
+\newcommand\IMP{\keyword{IMP}}
+\newcommand\IMPSE{\keyword{IMP{+}SE}}
+\newcommand\REC{\keyword{REC}}
+\newcommand\ID{\keyword{id}}
+\newcommand\Cl{\semanticsfont{Cl}}
+\newcommand\Env{\semanticsfont{Env}}
+\newcommand\FEnv{\semanticsfont{FEnv}}
+\renewcommand\Set{\semanticsfont{Set}}
+
+\newcommand\seq[3]{#1_{#2},\ldots,#1_{#3}}
+\newcommand\substtwo[5]{\subst{#1}{#2}{#3,\,#4/#5}}
+\newcommand\substlist[5]{\subst{#1}{#2}{#3,\ldots,#4/#5}}
+\newcommand\Unifyname{\keyword{Unify}}
+\newcommand\Unify[1]{\Unifyname(#1)}
+\newcommand\fa[2]{\forall{#1}\kern1pt.\kern1pt{#2}}%
+\newcommand\Judge[4]{\judge{#1;\,#2}{#3}{#4}}
+\newcommand\linfer[2]{\ensuremath{\dfrac{#2}{#1}}}%
+\renewcommand\hat\widehat
+\newcommand\comp[2]{{#1}\mathrel{;}{#2}}
+\newcommand\ite[3]{\ifthenelse{#1}{#2}{#3}}
+\newcommand\whd[2]{\whiledo{#1}{#2}}
+\newcommand\assg[2]{{#1}\mathrel{:=}{#2}}
+\newcommand\barnone{\bar{\rule{0mm}{1ex}\hspace{1ex}}}
+\renewcommand\d[1]{\mbox{\rm\texttt<}#1\mbox{\rm\texttt>}}
+\newcommand\bx[1]{\mbox{\rm\texttt[}#1\mbox{\rm\texttt]}}
+
+\newenvironment{proofof}[1]{\addtolength{\topsep}{1mm}\begin{trivlist}\item[]\hspace{\parindent}{\em Proof of #1.}}{\qed\end{trivlist}}
+\newenvironment{proofsketch}{\addtolength{\topsep}{1mm}\begin{trivlist}\item[]\hspace{\parindent}{\em Proof sketch.}}{\qed\end{trivlist}}
+
+\newcommand\lamcal{$\lambda$-calculus}
+\newcommand\mut[2]{\mu#1.\,#2}
+%\renewcommand\star{^{\textstyle *}}
+
+\newsavebox{\fterm}
+\newsavebox{\gterm}
+\savebox{\fterm}(40,20){
+\begin{picture}(40,20)(-20,-20)
+\put(0,0){\makebox(0,0){$f$}}
+\put(-5,-5){\line(-1,-1){10}}
+\put(5,-5){\line(1,-1){10}}
+\end{picture}
+}
+
+\savebox{\gterm}(0,20){
+\begin{picture}(0,20)(0,-20)
+\thicklines
+\put(0,0){\makebox(0,0){$g$}}
+\put(0,-5){\line(0,-1){10}}
+\end{picture}
+}
+
+\def\dead{(\;)}
+\def\eps{\epsilon}
+\def\edge#1#2#3{#1\stackrel{#2}{\to}#3}
+\newcommand\trans[1]{\stackrel{#1}{\to}}
+\newcommand\sem[1]{\ensuremath{\mathtt{[\hspace{-0.15em}[}\kern1pt#1\kern1pt\mathtt{]\hspace{-0.15em}]}}}
+\newcommand\DA[1]{_{#1}}
+\def\lAC{\leq_{\rm AC}}
+\def\lFIN{\leq_{\rm FIN}}
+
+\newcommand\MM{M}
+\newcommand\NN{N}
+\newcommand\LL{\mathcal{L}}
+
+\newcommand{\syntaxfont}{\textsf}
+%\newcommand{\solution}[1]{\vspace{6pt}\fbox{Solution:} #1 \vspace{6pt}}
+\newcommand\dotminus{\mathrel{\begin{picture}(8,8)\put(0,0){$-$}\put(2,5){\Large.}\end{picture}}}
+\newcommand{\impfor}{IMP$_{\mbox{\scriptsize FOR}}$}
+\newcommand\fordo[2]{\keyword{for}~{#1}~\keyword{do}~#2}
+\newcommand\Sem[3]{\SB{#1}{#2}{#3}}
+\newcommand\throw[1]{\mbox{\syntaxfont{throw}}~#1}
+\newcommand\trycatchfinally[4]{\syntaxfont{try}~{\{#1\}}~\syntaxfont{catch}~#2~{\{#3\}}~\syntaxfont{finally}~{\{#4\}}}
+\newcommand\tcc[5]{\syntaxfont{try}~{\{#1\}}~\syntaxfont{catch}~#2~{\{#3\}}~\syntaxfont{catch}~#4~{\{#5\}}}
+\newcommand\tccc[5]{\syntaxfont{try}~{\{#1\}}~\syntaxfont{catch}~#2~{\{#3\}}~\ldots~\syntaxfont{catch}~#4~{\{#5\}}}
+\newcommand\oite[3]{\mbox{if\;} #1\mbox{\;then\;}#2\mbox{\;else\;}#3}
+\newcommand\trycatch[3]{\syntaxfont{try}~{\{#1\}}~\syntaxfont{catch}~{#2}~{\{#3\}}}
+\newcommand\tryfinally[2]{\syntaxfont{try}~{\{#1\}}~\syntaxfont{finally}~{\{#2\}}}
+%\newcommand\Stmt{\mbox{\textsf{Stmt}}}
+\newcommand\Exc{\semanticsfont{Exc}}
+\newcommand\NCont{\semanticsfont{NCont}}
+\newcommand\XCont{\semanticsfont{XCont}}
+\newcommand\States{\semanticsfont{St}}
+%\newcommand\Bool{\mbox{\textsf{Bool}}}
+\newcommand\func[3]{\keyword{function}~#1~\keyword{throws}~#2~\{#3\}}
+\newcommand\call[1]{\keyword{call}~#1}
+\newcommand\ok[1]{{\vdash}\;#1\;\keyword{is~ok}}
+\newcommand\frat[2]{\frac{\rule[-3pt]{0pt}{10pt}\displaystyle #1}{\rule{0pt}{10pt}\displaystyle #2}}
+\renewcommand\ss[3]{\config{#1}{#2}\Downarrow #3}
+\newcommand\pfun{\rightharpoonup}
+\newcommand\DD{\mathcal{D}}
+%\newcommand\umlbang{\keyword{uML!}}
+\newcommand\FTV[1]{\mathit{FTV}(#1)}
+
+\newcommand{\pj}[2]{\Delta#1 \vdash #2}
+\newcommand{\ptj}[4]{\Delta#1;\Gamma#2 \vdash #3 : #4}
+
+\newenvironment{omitInSolution}
+  {\ifsolution\setbox0=\vbox\bgroup\fi}
+  {\ifsolution\egroup\fi}
+
+% from exams
+
+\newcommand{\epack}[3]{\keyword{pack}~[#1=#2,#3]}
+\newcommand{\eunpack}[4]{\keyword{unpack}~#1~\keyword{as}~[#2,#3]~\keyword{in}~#4}
+\newcommand{\imp}{\Rightarrow}
+\newcommand{\andd}{\wedge}
+\newcommand{\orr}{\vee}
+
+\newcommand\dcond[3]{\text{if } #1 \text{ then } #2 \text{ else } #3}
+
+\newcommand{\LET}{\keyword{let}}
+\newcommand{\AND}{\keyword{and}}
+\newcommand{\OR}{\keyword{or}}
+\newcommand{\NOT}{\keyword{not}}
+\newcommand{\ADD}{\keyword{add}}
+\newcommand{\SUB}{\keyword{sub}}
+\newcommand{\MUL}{\keyword{mul}}
+\newcommand{\EXP}{\keyword{exp}}
+\newcommand{\FACT}{\keyword{fact}}
+\newcommand{\IN}{\keyword{in}}
+\newcommand{\SUCC}{\keyword{succ}}
+\newcommand{\PRED}{\keyword{pred}}
+\newcommand{\ZERO}{\keyword{zero}}
+\newcommand{\MODULE}{\keyword{module}}
+\newcommand{\EXTEND}{\keyword{extend}}
+\newcommand{\WITH}{\keyword{with}}
+\newcommand{\UNK}{\keyword{unk}}
+
+\newcommand\TRANS{\text{\keyword{save}}}
+\newcommand\TRANSc[2]{\TRANS~#1~\IN~#2~\END}
+\newcommand\TRY{\keyword{try}}
+\newcommand\TRYc[1]{\TRY~#1~\keyword{end}}
+\newcommand\ABORT{\keyword{abort}}
+
+\newcommand\MERGE{\keyword{MERGE}}
+
+\newcommand\clam[2]{\overline{\lambda}#1\,.\,#2}
+
+\newcommand\A[1]{\Tr A{#1}}
+\newcommand\B[1]{\Tr B{#1}}
+\newcommand\bexp{\keyword{Bexp}}
+\newcommand\aexp{\keyword{Aexp}}
+\newcommand\com{\keyword{Com}}
+\newcommand\END{\keyword{end}}
+
+\newcommand{\lqt}{\textrm{``}}
+\newcommand{\rqt}{\textrm{''}}
+\newcommand{\qt}[1]{\lqt #1\rqt}
+
+\newcommand\answr{\keyword{Answer}}
+\newcommand\Bx{\mathrel{\Box}}
+
+%\newcommand\dountil[2]{\ensuremath{\keyword{do}~{#1}~\keyword{until}~{#2}}}
+\newcommand\forloop[4]{\ensuremath{\keyword{for}~(#1,#2,#3)~\keyword{do}~{#4}}}
+\newcommand\inc{\mbox{\tt ++}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% macros that were interspersed in the text %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand\eqobs{\mathrel{\equiv_{\mathrm{obs}}}}
+\newcommand\eqdown{\mathrel{\equiv_{\mathrm{\Downarrow}}}}
+\newcommand\lt{<}
+\newcommand\gt{>}
+\newcommand\rebind[3]{#1[#2/#3]}
+\newcommand\NIL{\keyword{nil}}
+\newcommand{\choice}{\;[]\;}
+\definecolor{darkgreen}{rgb}{0.05,0.25,0}
+\definecolor{green}{rgb}{0,0.55,0}
+\definecolor{red}{rgb}{0.75,0,0}
+\newcommand{\darkgreen}[1]{{\color{darkgreen} #1}}
+\newenvironment{green}{\color{green}}{\color{black}}
+\newenvironment{red}{\color{red}}{\color{black}}
+\newcommand{\choicep}{\;[]_p\;}
+\newcommand\len[1]{|\kern1pt{#1}\kern1pt|}
+\newcommand{\lub}{\sqcup}
+\newcommand\FL{\keyword{FL}}
+\newcommand\Cpp{C\raisebox{1pt}{\scriptsize ++}}
+\newcommand\FLM{\keyword{FL\hyphen M}}
+\newcommand\Loc{\semanticsfont{Loc}}
+\newcommand\SBA[3][]{\SB[#1]{#2}\kern1pt{#3}}
+\newcommand\SBB[4][]{\SB[#1]{#2}\kern1pt{#3}\kern1pt{#4}}
+\newcommand\SBC[5][]{\SB[#1]{#2}\kern1pt{#3}\kern1pt{#4}\kern1pt{#5}}
+\renewcommand\SBk[1]{\SBA{#1}{k}}
+
+\newcommand\semanticsfont[1]{\text{\textsl{#1}}}
+\newcommand\metaifthenelse[3]{\semanticsfont{if}~#1~\semanticsfont{then}~#2~\semanticsfont{else}~#3}
+\newcommand\metaletin[3]{\semanticsfont{let}~#1=#2~\semanticsfont{in}~#3}
+\newcommand\Y{\keyword{Y}}
+\newcommand\score{\_\kern-1pt\_}
+%\renewcommand\lookup[2]{\keyword{lookup}\,{#1}\,{#2}}
+%\renewcommand\update[3]{\keyword{update}\,{#1}\,{#2}\,{#3}}
+\newcommand\CHECKFUN{\keyword{check\hyphen fun}}
+\newcommand\CHECKCONT{\keyword{check\hyphen cont}}
+\newcommand\KA{\keyword{KA}}
+\newcommand\KAT{\keyword{KAT}}
+\newcommand\PDL{\keyword{PDL}}
+\newcommand\DL{\keyword{DL}}
+\newcommand\GCL{\keyword{GCL}}
+\newcommand{\pstepsto}{\stepsone_p}
+\newcommand{\cons}{\mathrel{::}}
+\newcommand{\assn}[1]{\ensuremath{\{#1\}}}
+\newcommand{\OD}{\keyword{od}}
+\newcommand{\FI}{\keyword{fi}}
+\newcommand{\EXEC}{\keyword{exec}}
+\newcommand{\YIELD}{\keyword{yield}}
+\newcommand{\FAIL}{\keyword{fail}}
+\newcommand{\FIX}{\keyword{fix}}
+\newcommand\Mfont[1]{\semanticsfont{#1}}
+\newcommand\pair[2]{\langle{#1},{#2}\rangle}
+\renewcommand\eps{\varepsilon}
+\newcommand\upf{\text{\textsl{up}}}
+\newcommand\downf{\text{\textsl{down}}}
+\newcommand\up[1]{\upf(#1)}
+\newcommand\down[1]{\downf(#1)}
+\newcommand\F[1]{{\cal F}(#1)}
+\newcommand\dle{\mathrel{\lower 2pt\vbox{\hbox{\lower 9pt\hbox{$\sqsubset$}}\hbox{\lower 3pt\hbox{$\sim$}}}}}
+\newcommand\liftfn[1]{#1^{\bot}}
+\newcommand\Cgr[1]{\SBB[C]{#1}\Gamma\rho}
+\newcommand{\mth}[1]{\ensuremath{#1}}
+\newcommand{\arr}{\ensuremath{\to}}
+\newcommand\unpack[3]{\letin{#2}{#1}{#3}}
+\newcommand\pack[2]{{#2}_{#1}}
+\newcommand\dty{::}
+\newcommand\dtype[2]{::}
+\newcommand{\evd}{\bullet}
+\newcommand\loc[1]{\mathrm{loc}(#1)}
+\newcommand\nil{[\,]}
+\newcommand\niltype{\diamond}
+\newcommand\append{\,@\,}
+\newcommand\Fexc{\ensuremath{\mathit{F}_{{\scriptsize \textrm{exc}}}}}
+
+\newcommand{\dual}{\ensuremath{^{\circ}}}
+\newcommand{\ddual}{\ensuremath{^{\circ\circ}}}
+\newcommand{\iinl}{\ensuremath{"inl"}}
+\newcommand{\iinr}{\ensuremath{"inr"}}
+\newcommand{\fst}{\ensuremath{"fst"}}
+\newcommand{\snd}{\ensuremath{"snd"}}
+\newcommand{\case}{\ensuremath{"case"}}
+\newcommand{\of}{\ensuremath{"of"}}
+\newcommand{\dnot}{\ensuremath{"not"}}
+\newcommand{\bnfeq}{\ensuremath{\ \ ::= \ \ }}
+\newcommand{\at}{\ensuremath{\mathrel{@}}}
+\newcommand\rec[3]{\mathsf{rec}\,{#1}\kern1pt.\kern1pt\lam{#2}{#3}}
+
+\newcommand{\VarTypes}{\textit{VarTypes}}
+\newcommand{\StackTypes}{\textit{StackTypes}}
+\newcommand{\Stype}{\Mfont{SType}}
+\newcommand{\refr}{\textsf{ref}}
+\newcommand{\intg}{\textsf{int}}
+\newcommand{\any}{\textsf{any}}
+
+\newcommand{\aload}{\textsf{aload}}
+\newcommand{\astore}{\textsf{astore}}
+\newcommand{\new}{\textsf{new}}
+\newcommand{\putfield}{\textsf{putfield}}
+\newcommand{\getfield}{\textsf{getfield}}
+\newcommand{\bipush}{\textsf{bipush}}
+\newcommand{\iload}{\textsf{iload}}
+\newcommand{\istore}{\textsf{istore}}
+\newcommand{\iadd}{\textsf{iadd}}
+\newcommand{\ifcond}{\textsf{ifcond}}
+\newcommand{\ifacmpcond}{\textsf{if\_acmpcond}}
+\newcommand{\dup}{\textsf{dup}}
+\newcommand{\pop}{\textsf{pop}}
+
+\newcommand\FST[1]{\mbox{left}~#1}
+\newcommand\SND[1]{\mbox{right}~#1}
+\newcommand{\gh}{\hat{\gamma}}
+\newcommand{\lppexpty}[4]{\Delta#1;\Gamma#2 \vdash #3 : #4}
+\newcommand{\lppty}[2]{\Delta#1 \vdash #2}
+\newcommand{\efold}[2]{"fold"_{#1}~#2}
+\newcommand{\eunfold}[1]{"unfold"~#1}
+\newcommand{\DTsum}[1]{{\cal T^{+}}\SB{#1}}
+\newcommand{\DTprod}[1]{{\cal T^{*}}\SB{#1}}
+\newcommand{\DEsum}[1]{{\cal E^{+}}\SB{#1}}
+\newcommand{\DEprod}[1]{{\cal E^{*}}\SB{#1}}
+\newcommand{\DGsum}[1]{{\cal G^{+}}\SB{#1}}
+\newcommand{\DGprod}[1]{{\cal G^{*}}\SB{#1}}
+\newcommand\DGP{\Delta;\Gamma\proves}
+\newcommand\GP{\Gamma\proves}
+\newcommand\DGTP{\Delta;\SB\Gamma\proves}
+\newcommand{\stepss}{\stepsone^*}
+\newcommand\DSG{\Delta;\SB{\Gamma}}
+\newcommand\DSGP{\Delta;\SB{\Gamma}\proves}
+\newcommand\DXSGP{\Delta, X;\SB{\Gamma}\proves}
+
+\newcommand{\slant}[1]{\ensuremath{#1}}
+\newcommand{\CASE}{\keyword{case}}
+\newcommand{\OF}{\keyword{of}}
+\newcommand{\qqquad}{\qquad\quad}
+\newcommand{\qqqquad}{\qquad\qquad}
+\newcommand{\qqqqquad}{\qquad\qquad\quad}
+\newcommand{\qqqqqquad}{\qquad\qquad\qquad}
+\newcommand{\qqqqqqquad}{\qquad\qquad\qquad\quad}
+\newcommand{\ARRAY}{\keyword{array}}
+\newcommand{\GET}{\keyword{get}}
+\newcommand{\SET}{\keyword{set}}
+\newcommand{\LENGTH}{\keyword{length}}
+\newcommand{\RESIZE}{\keyword{resize}}
+\renewcommand\bar[1]{\overline{#1}}
+
+%%%%%%%%%%%%%%%%%% capsules
+
+\newcommand\rpt[2]{\ensuremath{\mathsf{repeat}\ #1\ \mathsf{until}\ #2}}
+
+\newcommand\mathname[1]{\ensuremath{\mathsf{#1}}}
+\newcommand\var{\mathname{var}}
+\newcommand\val{\mathname{val}}
+\newcommand\Irr{\mathname{Irred}}
+\newcommand\Exp{\mathname{Exp}}
+\newcommand\Eval{\mathname{Eval}}
+\newcommand\TVar{\mathname{TVar}}
+\newcommand\arityname{\mathname{arity}}
+\newcommand\arity[1]{\arityname(#1)}
+\newcommand\RVar{\mathname{RVar}}
+\newcommand\RExp{\mathname{RExp}}
+\newcommand\St{\mathname{St}}
+\newcommand\fresh{\mathname{fresh}}
+\newcommand\BVar{\mathname{BVar}}
+\newcommand\bool{\mathname{bool}}
+\renewcommand\int{\mathname{int}}
+\newcommand\str{\mathname{string}}
+\newcommand\TCon{\mathname{TCon}}
+\newcommand\id{\mathname{id}}
+\newcommand\BVname{\mathname{BV}}
+\newcommand\BV[1]{\BVname(#1)}
+\newcommand\Capsules{\mathname{Cap}}
+\newcommand\subs{\subseteq}
+
+\newcommand\innerprod{\mathrel{\raisebox{1pt}{$\scriptscriptstyle\bullet$}}}
+\renewcommand\angle[1]{\langle{#1}\rangle}
+\newcommand\state[2]{\angle{#1,\,#2}}
+\newcommand\closure[2]{\{#1,\,#2\}}
+\newcommand\strikeout[1]{\settowidth{\reasonwidth}{#1}\makebox[0pt][l]{#1}\raisebox{.4ex}{\rule{\reasonwidth}{.5pt}}}
+\newcommand\ctxt[1]{C\bx{#1}}
+\newcommand\ctxtcdot{\ctxt{\kern1pt{\cdot}\kern1pt}}
+
+\newcommand\rest{{\kern1pt\restriction\kern1pt}}
+\newcommand\One{\ensuremath{\mathbbm 1}}
+\newcommand\FAlg{F\hyphen\mathsf{Alg}}
+\newcommand\FCoalg{F\hyphen\mathsf{Coalg}}
+\newcommand\Sdl{(S,\,\delta,\,\ell)}
+\newcommand\Sdls{(S,\,\delta,\,\ell,\,s_0)}
+\newcommand\TDL{(T,\,\Delta,\,L)}
+
+\newcommand\dummy{\ensuremath{\langle\mathit{dummy}\rangle}}
+\newlength{\boxlength}
+
+\newcommand\CT[1]{C{#1}}
+\newcommand\Apply{\mathname{Apply}}
+\newcommand\Applyb{\Apply_\beta}
+\newcommand\Evalb{\Eval_\beta}
+\newcommand\Applyc{\Apply_{\mathrm c}}
+\newcommand\Evalc{\Eval_{\mathrm c}}
+\newcommand\Const{\textsl{Const}}
+\newcommand\LAbs{\lambda\hyphen\textsl{Abs}}
+\newcommand\OCaml{OCaml}
+
+\newlength\towidth
+\settowidth\towidth{$\to$}
+\newcommand\drvc{\mathrel{
+\makebox[0pt][l]{\makebox[\towidth][c]{\raisebox{-1.6pt}[0pt][0pt]{\kern-1pt$_c$}}}
+\makebox[0pt][l]{\makebox[\towidth][c]{\raisebox{.7pt}[0pt][0pt]{\kern-1pt$^*$}}}
+\makebox[\towidth][c]{$\to$}}}
+\newcommand\drvcns{\mathrel{
+\makebox[0pt][l]{\makebox[\towidth][c]{\raisebox{-1.6pt}[0pt][0pt]{\kern-1pt$_c$}}}
+\makebox[0pt][l]{\makebox[\towidth][c]{\raisebox{.7pt}[0pt][0pt]{ }}}
+\makebox[\towidth][c]{$\to$}}}
+\newcommand\drvs{\mathrel{
+\makebox[0pt][l]{\makebox[\towidth][c]{\raisebox{-1.6pt}[0pt][0pt]{ }}}
+\makebox[0pt][l]{\makebox[\towidth][c]{\raisebox{.7pt}[0pt][0pt]{\kern-1pt$^*$}}}
+\makebox[\towidth][c]{$\to$}}}
+
+\newcommand\boldsigma{\ensuremath{\bm{\sigma}}}
+\newcommand\boldtau{\ensuremath{\bm{\tau}}}
+\newcommand\boldrho{\ensuremath{\bm{\rho}}}
+\newcommand\boldpi{\ensuremath{\bm{\pi}}}
+\renewcommand\bar[1]{\overline{#1}}
+%%%%% end local defs
+
+\newcommand\tprod[1]{\raisebox{1pt}{$\textstyle\prod$}\kern2pt{#1}}
+\newcommand\tsum[1]{\raisebox{1pt}{$\textstyle\sum$}\kern2pt{#1}}
+\renewcommand\inj[1]{\iota_{#1}}
+\newcommand\CrG{}
+\newcommand\insum[2]{\inj{#1}\,{#2}}
+%\newcommand\tuple[1]{\texttt{\upshape{(}}{#1}\texttt{\upshape{)}}}
+\newcommand\tuple[1]{(#1)}
+\newcommand\progfont[1]{"#1"}
+\renewcommand\unit{\tuple{}}
+\renewcommand\bx[1]{[#1]}
+\newcommand\caseof[1]{\text{\progfont{case $#1$ of}}}
+\newcommand\Id{\textsl{Id}}
+\newcommand\ssum{\textstyle\sum}
+\newcommand\sprod{\textstyle\prod}
+\renewcommand\TVar{\textsl{TVar}}
+
