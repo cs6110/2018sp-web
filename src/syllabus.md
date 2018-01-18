@@ -103,6 +103,15 @@ To get full credit on the 5% of your grade allocated to participation, you just 
 
 Free points!
 
+## The Difficulty You Can Expect
+
+This is a PhD-level course, which means the homework and exams can feel very different from undergrad courses. These difference may be surprising, especially if this is one of your first grad classes:
+
+* The homework will ask you to do new things *that you have not practiced already during lecture*. This can make the homework feel difficult, and you may even get totally stumped on some problems. This is normal. But it does mean that you should start early and leave time to ask questions.
+* Problems on exams will feel more familiar and should stretch you somewhat less. On the other hand, they will not be slightly tweaked versions of previous homework problems.
+
+Here's a special message for PhD students: Please try not to worry about your grade. I don't know how to put this delicately, but grades matter less as a PhD student than they did in undergrad. Focus on getting as much PL knowledge as you can out of this course---not on acing every assignment.
+
 # Policies
 
 ## Academic Integrity
