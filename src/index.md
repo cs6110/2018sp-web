@@ -21,7 +21,10 @@ in Gates 411A
 ### Teaching Assistants
 
 [**Steffen Smolka**][steffen]  
-<smolka@cs.cornell.edu>
+<smolka@cs.cornell.edu>  
+office hours (in Gates 442):
+* Thursday 4:30pm
+* Friday 9am (before class)
 
 **Daniel Sainati**  
 <dhs253@cornell.edu>
