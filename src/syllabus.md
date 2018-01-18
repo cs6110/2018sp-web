@@ -4,11 +4,13 @@ layout: layout.html
 order: 2
 ---
 
-CS 6110 is Cornell's graduate class on programming languages. It represents what we think *every* PhD student should know about the theory and practice underlying computation. It blends formal foundations with real-world applications and connections to other fields in computer science.
+CS 6110 is Cornell's graduate class on programming languages. It represents what we think every CS PhD student should know about the theory and practice underlying programs. It blends formal foundations with real-world applications and connections to other fields in computer science.
 
 # TL;DR
 
-- All course communication will happen on [Piazza][]. Please sign up and turn on email notifications.
+- All course communication will happen on [Slack][].
+  - Please [sign up][slack-signup]. You can use an @cornell.edu or @cs.cornell.edu email address to register.
+  - You're responsible for knowing everything that gets posted in #announcements. Please turn on notifications for that channel.
 - Homework and grading happens on [CMS][].
 - There will be five two-week homework assignments.
   - You can work in pairs on homework if you like, in which case you'll write one submission together.
@@ -19,21 +21,22 @@ CS 6110 is Cornell's graduate class on programming languages. It represents what
 - Expect the homework to make you try things we haven't done in class. Exams will be less expansive.
 - Grading for both homework assignments and exams will have a high standard for precision---because this class is about formalism, little details and mistakes matter more than they do in other classes.
 
-[piazza]: https://piazza.com/cornell/spring2017/cs6110
 [cms]: https://cmsx.cs.cornell.edu/
 [finals]: https://registrar.cornell.edu/exams/spring-final-exam-schedule
+[slack-signup]: https://join.slack.com/t/cs6110-2018sp/signup
+[slack]: https://cs6110-2018sp.slack.com/
 
 # Organization
 
-## Announcements and Q&A: Piazza
+## Announcements and Q&A: Slack
 
-We will use a [Piazza][] forum for announcements and communication about the course. Please [sign up for the Piazza instance][piazza]. The course staff will post important updates there that you really want to know about! Check often and enable email notifications.
+We will use a [Slack][] workspace for announcements and communication about the course. (We're using Slack *instead of* Piazza this semester.) Please [sign up for the Slack instance][slack-signup]. The course staff will post important updates there that you really want to know about! Check often, and be sure to enable notifications for the #announcements channel.
 
-You can also ask questions---about lectures, homework, or anything else---on Piazza. The course staff will respond as quickly as possible. It's the most efficient way to get help.
+You can also ask questions---about lectures, homework, or anything else---on Slack. The #pl channel is for this kind of discussion. The course staff will respond as quickly as possible.
 
-If you can answer a question yourself, please do! But be careful not to post answers---if you're not sure whether something is OK to post, you can use the "private" flag to make it visible to the instructors only.
+If you can answer a question yourself, please do! But be careful not to post answers---if you're not sure whether something is OK to post, contact the course staff privately. You can do that by sending a **direct message** in Slack to Adrian, Steffen, and Daniel.
 
-A good Piazza post asks a specific question. Here are some examples of bad Piazza posts:
+A good post asks a specific question. Here are some examples of bad Slack posts:
 
 * "Tell me more about broad topic X."
 * "Does anyone have any hints for problem Y?"
