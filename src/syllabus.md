@@ -9,7 +9,7 @@ CS 6110 is Cornell's graduate class on programming languages. It represents what
 # TL;DR
 
 - All course communication will happen on [Slack][].
-  - Please [sign up][slack-signup]. You can use an @cornell.edu or @cs.cornell.edu email address to register.
+  - Please [sign up][slack-signup] using an @cornell.edu or @cs.cornell.edu email address.
   - You're responsible for knowing everything that gets posted in #announcements. Please turn on notifications for that channel.
 - Homework and grading happens on [CMS][].
 - There will be five two-week homework assignments.
@@ -18,8 +18,9 @@ CS 6110 is Cornell's graduate class on programming languages. It represents what
 - There will be one prelim and one final exam.
   - The preliminary exam is a "take-home" exam. You'll have 24 hours to take the exam anywhere in the week just before spring break.
   - The final exam will use the course's allocated [final slot][finals].
-- Expect the homework to make you try things we haven't done in class. Exams will be less expansive.
-- Grading for both homework assignments and exams will have a high standard for precision---because this class is about formalism, little details and mistakes matter more than they do in other classes.
+- The homework and exams may feel different from other classes, especially undergrad courses.
+  - Expect the homework to make you try things we haven't done in class. Expect to get stuck and to ask for help. Exams will be less expansive but will still require original thought.
+  - Grading for both homework assignments and exams will have a high standard for precision. Because this class is about formalism, little details matter more than the getting the gist right.
 
 [cms]: https://cmsx.cs.cornell.edu/
 [finals]: https://registrar.cornell.edu/exams/spring-final-exam-schedule
@@ -109,6 +110,8 @@ This is a PhD-level course, which means the homework and exams can feel very dif
 
 * The homework will ask you to do new things *that you have not practiced already during lecture*. This can make the homework feel difficult, and you may even get totally stumped on some problems. This is normal. But it does mean that you should start early and leave time to ask questions.
 * Problems on exams will feel more familiar and should stretch you somewhat less. On the other hand, they will not be slightly tweaked versions of previous homework problems.
+
+Grading on both homework and exams will intentionally focus on nitpicky details. Compared to other courses, we will give more weight to "small" mistakes and less weight to getting the general idea right. That's the nature of this course, which is about formalism. Often, the intuitive idea behind a problem is totally obvious! Then, the topic we're working on is 100% about getting the nitty-gritty formal details right so we can prove something beyond a shadow of a doubt.
 
 Here's a special message for PhD students: Please try not to worry about your grade. I don't know how to put this delicately, but grades matter less as a PhD student than they did in undergrad. Focus on getting as much PL knowledge as you can out of this course---not on acing every assignment.
 
