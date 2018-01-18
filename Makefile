@@ -1,6 +1,7 @@
-.PHONY: build clean view serve deploy
+.PHONY: build clean view serve deploy notes
 
-build: node_modules
+build: node_modules notes
+	rsync -tv notes/build/lectures/*.pdf src/lectures
 	yarn run build
 
 serve: node_modules
@@ -14,6 +15,9 @@ view:
 
 node_modules: package.json
 	yarn
+
+notes:
+	make -C notes
 
 
 # Deployment.
