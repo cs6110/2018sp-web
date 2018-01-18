@@ -260,4 +260,7 @@
     assignments: A5 due
     topic: TK
 
-# The final exam hasn't been [scheduled](https://registrar.cornell.edu/exams) yet.
+-
+    mon: true
+    date: May 17
+    event: "Final Exam: 2pm, location TBD"
