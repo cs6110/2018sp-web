@@ -14,7 +14,9 @@ in {{ course.room }}
 ### Instructor
 
 [**Adrian Sampson**][adrian]  
-<asampson@cs.cornell.edu>
+<asampson@cs.cornell.edu>  
+office hours: Monday and Friday at 11am (after class)  
+in Gates 411A
 
 ### Teaching Assistants
 
