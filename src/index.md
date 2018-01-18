@@ -22,7 +22,7 @@ in Gates 411A
 
 [**Steffen Smolka**][steffen]  
 <smolka@cs.cornell.edu>  
-office hours (in Gates 420):
+office hours (in Gates 442):
 * Thursday 4:30pm
 * Friday 9am (before class)
 
