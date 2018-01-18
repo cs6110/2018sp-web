@@ -4,6 +4,9 @@ fulltitle: true
 layout: layout.html
 order: 0
 ---
+<img class="logo" src="img/logo.png"
+    alt="PROGRESS • PRESERVATION • SOUNDNESS">
+
 {{ course.days }}  
 at {{ course.time }}  
 in {{ course.room }}
