@@ -16,12 +16,16 @@ header {
     display: block;
     margin: auto;
     max-width: $max-width;
+    padding: 0 1rem;
   }
 }
 
 main {
   margin: 1rem auto;
   max-width: $max-width;
+
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 // On wide pages, do not constrain.
