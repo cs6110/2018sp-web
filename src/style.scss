@@ -119,7 +119,10 @@ table {
 
 // Logo.
 img.logo {
-  width: 256px;
-  height: 256px;
+  width: 40%;
+  height: auto;
   float: right;
+
+  margin-left: 0.5rem;
+  margin-bottom: 0.5rem;
 }
