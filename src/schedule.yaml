@@ -94,7 +94,6 @@
         notes: lec14.pdf
 -
     date: March 2
-    topic: TK
 
 -
     date: March 5
@@ -123,7 +122,6 @@
         notes: lec18.pdf
 -
     date: March 14
-    topic: TK
 -
     date: March 16
     topic: Typed λ-calculus
@@ -252,13 +250,11 @@
 -
     date: May 7
     mon: true
-    topic: TK
     links:
         notes: lecG.pdf
 -
     date: May 9
     assignments: A5 due
-    topic: TK
 
 -
     mon: true
