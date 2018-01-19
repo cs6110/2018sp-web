@@ -28,6 +28,8 @@ office hours (in Gates 442):
 
 **Daniel Sainati**  
 <dhs253@cornell.edu>
+office hours (in Gates G11):
+* Tuesday 12:30pm - 2:30pm
 
 [adrian]: http://www.cs.cornell.edu/~asampson/
 [steffen]: http://www.cs.cornell.edu/~smolka/
