@@ -110,20 +110,20 @@
         same notes: lec16.pdf
 -
     date: March 9  # Adrian @ ISCA PC
-    topic: Predicate Transformers
-    links:
-        notes: lec17.pdf
+    event: No class (Preliminary Exam)
 
 -
     date: March 12
     mon: true
+    topic: Predicate Transformers
+    links:
+        notes: lec17.pdf
+-
+    date: March 14
+    assignments: Prelim due, A3 out
     topic: Denotational Semantics
     links:
         notes: lec18.pdf
--
-    date: March 14
-    event: Preliminary Exam Due
-    assignments: Prelim due, A3 out
 -
     date: March 16
     topic: Typed λ-calculus
