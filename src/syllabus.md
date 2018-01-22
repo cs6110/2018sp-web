@@ -16,8 +16,7 @@ CS 6110 is Cornell's graduate class on programming languages. It represents what
   - You can work in pairs on homework if you like, in which case you'll write one submission together.
   - The deadline is always Wednesday night at 11:59pm. There are no points for late work, but please Slack us if you have extenuating circumstances.
 - There will be one prelim and one final exam.
-  - The preliminary exam is a "take-home" exam. You'll have 24 hours to take the exam anywhere during the space of one week.
-  - The final exam will use the course's allocated [final slot][finals].
+  - Both are "take-home" exams. You'll have 24 hours to take the exam anywhere during the space of one week.
 - The homework and exams may feel different from other classes, especially undergrad courses.
   - Expect the homework to make you try things we haven't done in class. Expect to get stuck and to ask for help. Exams will be less expansive but will still require original thought.
   - Grading for both homework assignments and exams will have a high standard for precision. Because this class is about formalism, little details matter more than the getting the gist right.
@@ -90,7 +89,7 @@ Aside from that, late work will not be accepted and will count for zero points.
 
 ## Exams
 
-There will be a take-home prelim a non-take-home final exam. You'll be able to take the prelim anywhere within a one-week period just before spring break; see the [course schedule][schedule]. The final will take place in the ordinary [final slot][finals] for the class, which, this semester, is **Tuesday, May 23 at 9:00am**.
+There will be a prelim and a final, both in a take-home format. You'll be able to take the exams anywhere within a one-week period. See the [course schedule][schedule].
 
 Makeup exams must be scheduled within the first three weeks of class. Check the schedule now to see if you have a conflict with another class and contact the instructor immediately to reschedule.
 
