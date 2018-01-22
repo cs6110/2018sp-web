@@ -14,7 +14,7 @@ CS 6110 is Cornell's graduate class on programming languages. It represents what
 - Homework and grading happens on [CMS][].
 - There will be five two-week homework assignments.
   - You can work in pairs on homework if you like, in which case you'll write one submission together.
-  - Your lowest homework score will be dropped, and you have 3 slip days you can allocate throughout the semester.
+  - The deadline is always Wednesday night at 11:59pm. There are no points for late work, but please Slack us if you have extenuating circumstances.
 - There will be one prelim and one final exam.
   - The preliminary exam is a "take-home" exam. You'll have 24 hours to take the exam anywhere during the space of one week.
   - The final exam will use the course's allocated [final slot][finals].
