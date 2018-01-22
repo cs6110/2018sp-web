@@ -16,7 +16,7 @@ table.schedule
       tr(class=day.canceled ? "canceled" : "" class=day.mon ? "mon" : "")
         td #{day.date}
         if day.event
-          td.event(colspan=3) #{day.event}
+          td.event(colspan=2) #{day.event}
         else
           td #{day.topic}
           td
@@ -24,4 +24,4 @@ table.schedule
               each file, name in day.links
                 a(href=relative(resolve("/lectures/", file))) #{name}
                 | #{" "}
-          td #{day.assignments}
+        td #{day.assignments}

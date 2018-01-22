@@ -16,7 +16,7 @@ CS 6110 is Cornell's graduate class on programming languages. It represents what
   - You can work in pairs on homework if you like, in which case you'll write one submission together.
   - Your lowest homework score will be dropped, and you have 3 slip days you can allocate throughout the semester.
 - There will be one prelim and one final exam.
-  - The preliminary exam is a "take-home" exam. You'll have 24 hours to take the exam anywhere in the week just before spring break.
+  - The preliminary exam is a "take-home" exam. You'll have 24 hours to take the exam anywhere during the space of one week.
   - The final exam will use the course's allocated [final slot][finals].
 - The homework and exams may feel different from other classes, especially undergrad courses.
   - Expect the homework to make you try things we haven't done in class. Expect to get stuck and to ask for help. Exams will be less expansive but will still require original thought.

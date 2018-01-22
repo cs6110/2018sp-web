@@ -104,7 +104,7 @@
         more: lec16.pdf
 -
     date: March 7
-    assignments: A2 due, A3 out
+    assignments: A2 due, Prelim out
     topic: Axiomatic Semantics and Hoare Logic
     links:
         same notes: lec16.pdf
@@ -122,6 +122,8 @@
         notes: lec18.pdf
 -
     date: March 14
+    event: Preliminary Exam Due
+    assignments: Prelim due, A3 out
 -
     date: March 16
     topic: Typed λ-calculus
@@ -136,7 +138,6 @@
         notes: lec20.pdf
 -
     date: March 21  # drop deadline
-    assignments: A3 due
     topic: Type Soundness, continued
     links:
         same notes: lec20.pdf
@@ -149,18 +150,17 @@
 -
     date: March 26  # Adrian @ ASPLOS
     mon: true
-    assignments: Prelim out
     topic: Strong Normalization
     links:
         notes: lec22.pdf
 -
     date: March 28  # Adrian @ ASPLOS
     topic: Strong Normalization, continued
+    assignments: A3 due
     links:
         same notes: lec22.pdf
 -
     date: March 30
-    event: Preliminary Exam Due
 
 -
     date: April 2
