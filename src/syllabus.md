@@ -70,8 +70,6 @@ Problem sets are due on Wednesdays at 11:59 PM. See the [course schedule][schedu
 
 [schedule]: {{ relative "/schedule.html" }}
 
-We will **drop one score** to calculate your final grade: that is, your lowest-scoring problem set won't count, even if that score is zero.
-
 You'll turn in assignments via [CMS][].
 We strongly encourage you to use TeX, but you can also write up answers by hand. If you do, scan your work and upload it as a PDF. It's your responsibility to make sure scans are 100% legible---we won't regrade work that was too hard to read.
 
