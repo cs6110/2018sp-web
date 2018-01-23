@@ -49,17 +49,9 @@ You will download homework assignments, upload solutions, and receive grades thr
 
 # Content
 
-## Textbooks
+We won't use a textbook, but if you like books, we have [some resources to suggest][rsrc].
 
-There are no required textbooks. However, if you find yourself wanting extra background, you might find these textbooks might be helpful:
-
-* *The Formal Semantics of Programming Languages* by Glynn Winskel.
-* *Types and Programming Languages* by Benjamin C. Pierce.
-
-And here are a couple of good online textbooks that are relevant to the course:
-
-* [*Programming Languages: Application and Interpretation*](http://cs.brown.edu/~sk/Publications/Books/ProgLangs/) by Shriram Krishnamurthi.
-* [*Software Foundations*](https://www.cis.upenn.edu/~bcpierce/sf/) by Benjamin C. Pierce and a supporting cast.
+[rsrc]: resources.html
 
 ## Grading
 

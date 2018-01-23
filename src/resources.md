@@ -22,3 +22,13 @@ If you are already familiar with another functional programming language, OCaml 
 [try]: https://try.ocamlpro.com
 
 ## Textbooks You Might Like
+
+There are no required textbooks, but  if you find yourself wanting extra background, you might find these textbooks helpful:
+
+* *The Formal Semantics of Programming Languages* by Glynn Winskel.
+* *Types and Programming Languages* by Benjamin C. Pierce.
+
+And here are a couple of good online textbooks that are relevant to the course:
+
+* [*Programming Languages: Application and Interpretation*](http://cs.brown.edu/~sk/Publications/Books/ProgLangs/) by Shriram Krishnamurthi.
+* [*Software Foundations*](https://www.cis.upenn.edu/~bcpierce/sf/) by Benjamin C. Pierce and a supporting cast.
