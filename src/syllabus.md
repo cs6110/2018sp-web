@@ -62,6 +62,8 @@ Final grades will be assigned with these proportions:
 * Final exam: 30%
 * Participation: 5%
 
+There are is no algorithm for "curving" grades or any predetermined cutoffs, so we won't be able to answer questions about letter-grade projections.
+
 ## Problem Sets
 
 Problem sets are due on Wednesdays at 11:59 PM. See the [course schedule][schedule]. You can work on problem sets with a partner; you'll turn in one completed assignment together.
