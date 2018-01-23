@@ -92,22 +92,22 @@
     topic: Continuations
     links:
         notes: lec14.pdf
+        more: lec15.pdf
 -
-    date: March 2  # Adrian @ UCLA
+    date: March 2  # Adrian @ UCLA; guest lecture by Daniel
+    topic: Axiomatic Semantics (guest lecture by Daniel Sainati)
+    links:
+        notes: lec16.pdf
 
 -
     date: March 5
     mon: true
-    topic: First-Class Continuations and Axiomatic Semantics
-    links:
-        notes: lec15.pdf
-        more: lec16.pdf
--
-    date: March 7
-    assignments: A2 due, Prelim out
     topic: Axiomatic Semantics and Hoare Logic
     links:
         same notes: lec16.pdf
+-
+    date: March 7
+    assignments: A2 due, Prelim out
 -
     date: March 9  # Adrian @ ISCA PC
     event: No class (Preliminary Exam)
@@ -148,19 +148,18 @@
         notes: lec21.pdf
 
 -
-    date: March 26  # Adrian @ ASPLOS
+    date: March 26  # Adrian @ ASPLOS; guest lecture by Steffen
     mon: true
+    topic: NetKAT (guest lecture by Steffen Smolka)
+-
+    date: March 28  # Adrian @ ASPLOS; guest lecture by Steffen
+    assignments: A3 due
+    topic: More NetKAT (again with Steffen Smolka)
+-
+    date: March 30
     topic: Strong Normalization
     links:
         notes: lec22.pdf
--
-    date: March 28  # Adrian @ ASPLOS
-    topic: Strong Normalization, continued
-    assignments: A3 due
-    links:
-        same notes: lec22.pdf
--
-    date: March 30
 
 -
     date: April 2
