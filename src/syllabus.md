@@ -128,7 +128,7 @@ On **problem sets**, everything you turn in must be 100% completely your own wor
 * *Definitely* ask the course staff if you're not sure whether or not something is OK.
 
 Here's the policy for **exams**: You may not give assistance to anyone or receive assistance of any kind from anyone at all during an exam.
-You can use notes from the class on the take-home prelim but not on the final.
+You can use notes from the class but not outside resources.
 
 You may not give any hints or post any code that might be part of a solution on Slack (except in a private message with course staff).
 
