@@ -32,3 +32,13 @@ And here are a couple of good online textbooks that are relevant to the course:
 
 * [*Programming Languages: Application and Interpretation*](http://cs.brown.edu/~sk/Publications/Books/ProgLangs/) by Shriram Krishnamurthi.
 * [*Software Foundations*](https://www.cis.upenn.edu/~bcpierce/sf/) by Benjamin C. Pierce and a supporting cast.
+
+## Extra Background
+
+Here are some well-written materials on standard PL topics:
+
+* For a self-contained overview of *structural induction*, see [some notes by John A. Thywissen for a class at UT Austin][thywissen].
+* for an overview of notation for inference rules, semantics, and types, see this [crash-course blog post by Jeremy Siek][siek].
+
+[siek]: https://siek.blogspot.com/2012/07/crash-course-on-notation-in-programming.html
+[thywissen]: https://www.cs.utexas.edu/%7Ejthywiss/Structural%20Induction%20in%20Programming%20Language%20Semantics.pdf
