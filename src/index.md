@@ -23,7 +23,7 @@ in Gates 411A
 [**Steffen Smolka**][steffen]  
 <smolka@cs.cornell.edu>  
 office hours (in Gates 442):
-* Thursday 4:30pm
+* Thursday after colloquium (~ 5:20pm)
 * Friday 9am (before class)
 
 **Daniel Sainati**  
