@@ -23,39 +23,39 @@
         notes: lec03.pdf
 -
     date: February 2
-    topic: Reduction Strategies, Operational Semantics
+    topic: Reduction Strategies
     links:
         notes: lec04.pdf
 
 -
     date: February 5
     mon: true
+    topic: Operational Semantics
+    links:
+        same notes: lec04.pdf
+-
+    date: February 7
     topic: Fixed Points
     links:
         notes: lec05.pdf
 -
-    date: February 7
+    date: February 9
     topic: Well-Founded Induction and Structural Induction
     links:
         notes: lec06.pdf
--
-    date: February 9
-    topic: More Structural Induction
-    links:
-        notes: lec07.pdf
 
 -
     date: February 12
     mon: true
-    topic: The IMP Language
+    topic: More Structural Induction
     links:
-        notes: lec08.pdf
+        notes: lec07.pdf
 -
     date: February 14
     assignments: A1 due
-    topic: More IMP and Big-Step Operational Semantics
+    topic: The IMP Language
     links:
-        same notes: lec08.pdf
+        notes: lec08.pdf
 -
     date: February 16
     topic: Big-Step Semantics and Evaluation Contexts
