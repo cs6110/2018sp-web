@@ -40,14 +40,14 @@
         notes: lec05.pdf
 -
     date: February 9
-    topic: Well-Founded Induction and Structural Induction
+    topic: Well-Founded Induction
     links:
         notes: lec06.pdf
 
 -
     date: February 12
     mon: true
-    topic: More Structural Induction
+    topic: Structural Induction
     links:
         notes: lec07.pdf
 -
