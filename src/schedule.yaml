@@ -23,44 +23,44 @@
         notes: lec03.pdf
 -
     date: February 2
-    topic: Reduction Strategies, Operational Semantics
+    topic: Reduction Strategies
     links:
         notes: lec04.pdf
 
 -
     date: February 5
     mon: true
+    topic: Operational Semantics
+    links:
+        same notes: lec04.pdf
+-
+    date: February 7
     topic: Fixed Points
     links:
         notes: lec05.pdf
 -
-    date: February 7
-    topic: Well-Founded Induction and Structural Induction
+    date: February 9
+    topic: Well-Founded Induction
     links:
         notes: lec06.pdf
--
-    date: February 9
-    topic: More Structural Induction
-    links:
-        notes: lec07.pdf
 
 -
     date: February 12
     mon: true
+    topic: Structural Induction
+    links:
+        notes: lec07.pdf
+-
+    date: February 14
+    assignments: A1 due
     topic: The IMP Language
     links:
         notes: lec08.pdf
 -
-    date: February 14
-    assignments: A1 due
-    topic: More IMP and Big-Step Operational Semantics
+    date: February 16
+    topic: More IMP
     links:
         same notes: lec08.pdf
--
-    date: February 16
-    topic: Big-Step Semantics and Evaluation Contexts
-    links:
-        notes: lec09.pdf
 
 -
     date: February 19
@@ -70,29 +70,28 @@
 -
     date: February 21
     assignments: A2 out
+    topic: Big-Step Semantics and Evaluation Contexts
+    links:
+        notes: lec09.pdf
+-
+    date: February 23
     topic: Semantics via Translation and a Functional Language
     links:
         same notes: lec09.pdf
         proof: lec10.pdf
         more: lec11.pdf
--
-    date: February 23
-    topic: Scope
-    links:
-        notes: lec12.pdf
 
 -
     date: February 26
     mon: true
+    topic: Scope
+    links:
+        notes: lec12.pdf
+-
+    date: February 28
     topic: State
     links:
         notes: lec13.pdf
--
-    date: February 28
-    topic: Continuations
-    links:
-        notes: lec14.pdf
-        more: lec15.pdf
 -
     date: March 2  # Adrian @ UCLA; guest lecture by Daniel
     topic: Axiomatic Semantics (guest lecture by Daniel Sainati)
@@ -102,9 +101,10 @@
 -
     date: March 5
     mon: true
-    topic: Axiomatic Semantics and Hoare Logic
+    topic: Continuations
     links:
-        same notes: lec16.pdf
+        notes: lec14.pdf
+        more: lec15.pdf
 -
     date: March 7
     assignments: A2 due, Prelim out
@@ -178,27 +178,27 @@
 -
     date: April 9
     mon: true
-    topic: Type Inference
+    topic: Subtyping
     links:
         notes: lec23.pdf
 -
     date: April 11
     assignments: A4 out
-    topic: Polymorphic λ-calculus
+    topic: Type Inference
     links:
         notes: lec24.pdf
 -
     date: April 13
-    topic: More Polymorphism
+    topic: Polymorphic λ-calculus
     links:
-        same notes: lec24.pdf
+        notes: lec25.pdf
 
 -
     date: April 16
     mon: true
-    topic: Subtyping
+    topic: More Polymorphism
     links:
-        notes: lec25.pdf
+        same notes: lec25.pdf
 -
     date: April 18
     topic: Recursive Types
