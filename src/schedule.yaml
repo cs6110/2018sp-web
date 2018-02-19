@@ -178,27 +178,27 @@
 -
     date: April 9
     mon: true
-    topic: Type Inference
+    topic: Subtyping
     links:
         notes: lec23.pdf
 -
     date: April 11
     assignments: A4 out
-    topic: Polymorphic λ-calculus
+    topic: Type Inference
     links:
         notes: lec24.pdf
 -
     date: April 13
-    topic: More Polymorphism
+    topic: Polymorphic λ-calculus
     links:
-        same notes: lec24.pdf
+        notes: lec25.pdf
 
 -
     date: April 16
     mon: true
-    topic: Subtyping
+    topic: More Polymorphism
     links:
-        notes: lec25.pdf
+        same notes: lec25.pdf
 -
     date: April 18
     topic: Recursive Types
