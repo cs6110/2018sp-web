@@ -75,14 +75,14 @@
         notes: lec09.pdf
 -
     date: February 23
-    topic: Evaluation Contexts
+    topic: Evaluation Contexts and Translational Semantics
     links:
         same notes: lec09.pdf
 
 -
     date: February 26
     mon: true
-    topic: Semantics via Translation and a Functional Language
+    topic: More Translation and a Functional Language
     links:
         same notes: lec09.pdf
         proof: lec10.pdf
