@@ -70,28 +70,28 @@
 -
     date: February 21
     assignments: A2 out
-    topic: Big-Step Semantics and Evaluation Contexts
+    topic: Big-Step Semantics
     links:
         notes: lec09.pdf
 -
     date: February 23
+    topic: Evaluation Contexts
+    links:
+        same notes: lec09.pdf
+
+-
+    date: February 26
+    mon: true
     topic: Semantics via Translation and a Functional Language
     links:
         same notes: lec09.pdf
         proof: lec10.pdf
         more: lec11.pdf
-
 -
-    date: February 26
-    mon: true
+    date: February 28
     topic: Scope
     links:
         notes: lec12.pdf
--
-    date: February 28
-    topic: State
-    links:
-        notes: lec13.pdf
 -
     date: March 2  # Adrian @ UCLA; guest lecture by Daniel
     topic: Axiomatic Semantics (guest lecture by Daniel Sainati)
@@ -101,13 +101,16 @@
 -
     date: March 5
     mon: true
+    topic: State
+    links:
+        notes: lec13.pdf
+-
+    date: March 7
+    assignments: A2 due, Prelim out
     topic: Continuations
     links:
         notes: lec14.pdf
         more: lec15.pdf
--
-    date: March 7
-    assignments: A2 due, Prelim out
 -
     date: March 9  # Adrian @ ISCA PC
     event: No class (Preliminary Exam)
