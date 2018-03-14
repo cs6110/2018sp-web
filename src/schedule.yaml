@@ -108,7 +108,6 @@
     topic: Continuations
     links:
         notes: lec14.pdf
-        more: lec15.pdf
 -
     date: March 9  # Adrian @ ISCA PC
     event: No class (Preliminary Exam)
@@ -116,46 +115,48 @@
 -
     date: March 12
     mon: true
+    topic: First-Class Continuations
+    links:
+        notes: lec15.pdf
+-
+    date: March 14
     topic: Axiomatic Semantics
     links:
         notes: lec16.pdf
 -
-    date: March 14
+    date: March 16
     assignments: Prelim due, A3 out
     topic: Predicate Transformers
     links:
         notes: lec17.pdf
--
-    date: March 16
-    topic: Denotational Semantics
-    links:
-        notes: lec18.pdf
 
 -
     date: March 19
     mon: true
+    topic: Denotational Semantics
+    links:
+        notes: lec18.pdf
+-
+    date: March 21  # drop deadline
     topic: Typed λ-calculus
     links:
         notes: lec19.pdf
 -
-    date: March 21  # drop deadline
+    date: March 23
     topic: Type Soundness
     links:
         notes: lec20.pdf
--
-    date: March 23
-    topic: Products, Sums, and Datatypes
-    links:
-        notes: lec21.pdf
 
 -
     date: March 26  # Adrian @ ASPLOS; guest lecture by Steffen
     mon: true
-    topic: NetKAT (guest lecture by Steffen Smolka)
+    topic: Products, Sums, and Datatypes
+    links:
+        notes: lec21.pdf
 -
     date: March 28  # Adrian @ ASPLOS; guest lecture by Steffen
     assignments: A3 due
-    topic: More NetKAT (again with Steffen Smolka)
+    topic: NetKAT (guest lecture by Steffen Smolka)
 -
     date: March 30
     topic: Strong Normalization
