@@ -126,42 +126,42 @@
 -
     date: March 16
     assignments: Prelim due, A3 out
-    topic: Predicate Transformers
+    topic: Hoare Logic & Examples
     links:
-        notes: lec17.pdf
+        same notes: lec16.pdf
 
 -
     date: March 19
     mon: true
+    topic: Predicate Transformers
+    links:
+        notes: lec17.pdf
+-
+    date: March 21  # drop deadline
     topic: Denotational Semantics
     links:
         notes: lec18.pdf
 -
-    date: March 21  # drop deadline
+    date: March 23
     topic: Typed λ-calculus
     links:
         notes: lec19.pdf
--
-    date: March 23
-    topic: Type Soundness
-    links:
-        notes: lec20.pdf
 
 -
     date: March 26  # Adrian @ ASPLOS; guest lecture by Steffen
     mon: true
-    topic: Products, Sums, and Datatypes
+    topic: Type Soundness
     links:
-        notes: lec21.pdf
+        notes: lec20.pdf
 -
     date: March 28  # Adrian @ ASPLOS; guest lecture by Steffen
     assignments: A3 due
     topic: NetKAT (guest lecture by Steffen Smolka)
 -
     date: March 30
-    topic: Strong Normalization
+    topic: Products, Sums, and Datatypes
     links:
-        notes: lec22.pdf
+        notes: lec21.pdf
 
 -
     date: April 2
@@ -180,79 +180,80 @@
 -
     date: April 9
     mon: true
+    topic: Strong Normalization
+    links:
+        notes: lec22.pdf
+-
+    date: April 11
+    assignments: A4 out
     topic: Subtyping
     links:
         notes: lec23.pdf
 -
-    date: April 11
-    assignments: A4 out
+    date: April 13
     topic: Type Inference
     links:
         notes: lec24.pdf
--
-    date: April 13
-    topic: Polymorphic λ-calculus
-    links:
-        notes: lec25.pdf
 
 -
     date: April 16
     mon: true
+    topic: Polymorphic λ-calculus
+    links:
+        notes: lec25.pdf
+-
+    date: April 18
     topic: More Polymorphism
     links:
         same notes: lec25.pdf
 -
-    date: April 18
+    date: April 20
     topic: Recursive Types
     links:
         notes: lec26.pdf
--
-    date: April 20
-    topic: Objects and Existential Types
-    links:
-        notes: lec27.pdf
 
 -
     date: April 23
     mon: true
+    topic: Objects and Existential Types
+    links:
+        notes: lec27.pdf
+-
+    date: April 25
+    assignments: A4 due; A5 out
     topic: Propositions as Types
     links:
         notes: lec28.pdf
 -
-    date: April 25
-    assignments: A4 due; A5 out
+    date: April 27
     topic: More Propositions as Types
     links:
         notes: lec29.pdf
--
-    date: April 27
-    topic: Linear Types
-    links:
-        notes: lec30.pdf
 
 -
     date: April 30
     mon: true
+    topic: Linear Types
+    links:
+        notes: lec30.pdf
+-
+    date: May 3
+    assignments: A5 proposal due
     topic: Kinds
     links:
         notes: lec31.pdf
 -
-    date: May 3
+    date: May 2
     topic: Dependent Types
-    assignments: A5 proposal due
     links:
         notes: lec32.pdf
--
-    date: May 2
-    topic: Theorem Provers
-    links:
-        notes: https://github.com/cs6110/2017sp-web/blob/master/src/lectures/leandemo.md
 
 -
     date: May 7
     mon: true
+    topic: Theorem Provers
     links:
-        notes: lecG.pdf
+        notes: https://github.com/cs6110/2017sp-web/blob/master/src/lectures/leandemo.md
 -
     date: May 9
     assignments: A5 due
