@@ -150,18 +150,18 @@
 -
     date: March 26  # Adrian @ ASPLOS; guest lecture by Steffen
     mon: true
+    topic: NetKAT (guest lecture by Steffen Smolka)
+-
+    date: March 28  # Adrian @ ASPLOS; guest lecture by Daniel
+    assignments: A3 due
+    topic: Products, Sums, and Datatypes (guest lecture by Daniel Sainati)
+    links:
+        notes: lec21.pdf
+-
+    date: March 30
     topic: Type Soundness
     links:
         notes: lec20.pdf
--
-    date: March 28  # Adrian @ ASPLOS; guest lecture by Steffen
-    assignments: A3 due
-    topic: NetKAT (guest lecture by Steffen Smolka)
--
-    date: March 30
-    topic: Products, Sums, and Datatypes
-    links:
-        notes: lec21.pdf
 
 -
     date: April 2
