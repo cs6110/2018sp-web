@@ -127,10 +127,12 @@ On **problem sets**, everything you turn in must be 100% completely your own wor
 * *Do* ask someone if you're confused about what the assignment is asking for.
 * *Definitely* ask the course staff if you're not sure whether or not something is OK.
 
-Here's the policy for **exams**: You may not give assistance to anyone or receive assistance of any kind from anyone at all during an exam.
-You can use notes from the class but not outside resources.
+Here's the policy for **exams**: outside of the course staff, you may not talk to anyone about any exam content at all until the exam is graded.
+Don't even tell anyone how you're feeling about the exam or what you found challenging: you must pretend that you have never seen the exam.
+You can use notes from the class, including both your own notes and our notes from the website, but not outside resources.
 
 You may not give any hints or post any code that might be part of a solution on Slack (except in a private message with course staff).
+On both assignments and exams, the web is always off limits: you may not Google anything or look anything up on Wikipedia to get help, for example.
 
 ## Respect in Class
 
