@@ -237,13 +237,13 @@
     links:
         notes: lec30.pdf
 -
-    date: May 3
+    date: May 2
     assignments: A5 proposal due
     topic: Kinds
     links:
         notes: lec31.pdf
 -
-    date: May 2
+    date: May 4
     topic: Dependent Types
     links:
         notes: lec32.pdf
