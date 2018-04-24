@@ -224,36 +224,34 @@
     topic: Propositions as Types
     links:
         notes: lec28.pdf
+        more: lec29.pdf
 -
     date: April 27
-    topic: More Propositions as Types
+    topic: Linear Types
     links:
-        notes: lec29.pdf
+        notes: lec30.pdf
 
 -
     date: April 30
     mon: true
-    topic: Linear Types
-    links:
-        notes: lec30.pdf
--
-    date: May 2
-    assignments: A5 proposal due
     topic: Kinds
     links:
         notes: lec31.pdf
 -
-    date: May 4
+    date: May 2
+    assignments: A5 proposal due
     topic: Dependent Types
     links:
         notes: lec32.pdf
+-
+    date: May 4
+    topic: Theorem Provers
+    links:
+        notes: https://github.com/cs6110/2017sp-web/blob/master/src/lectures/leandemo.md
 
 -
     date: May 7
     mon: true
-    topic: Theorem Provers
-    links:
-        notes: https://github.com/cs6110/2017sp-web/blob/master/src/lectures/leandemo.md
 -
     date: May 9
     assignments: A5 due
