@@ -245,13 +245,14 @@
         notes: lec32.pdf
 -
     date: May 4
-    topic: Theorem Provers
-    links:
-        notes: https://github.com/cs6110/2017sp-web/blob/master/src/lectures/leandemo.md
+    topic: Guest Lecture by Andrew Myers
 
 -
     date: May 7
     mon: true
+    topic: Theorem Provers
+    links:
+        notes: https://github.com/cs6110/2017sp-web/blob/master/src/lectures/leandemo.md
 -
     date: May 9
     assignments: A5 due
