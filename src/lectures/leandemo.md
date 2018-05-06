@@ -53,17 +53,17 @@ Similarly, `of nat` is OCaml's way of saying that `Succ` takes another `nat` as 
 
 # Evaluation and Type Checking
 
-To evaluate expressions in Lean, you have to write `eval` before them.
+To evaluate expressions in Lean, you have to write `#reduce` before them.
 For example:
 
-    eval nat'.succ nat'.zero
+    #reduce nat'.succ nat'.zero
 
 If you type this into the Web console for Lean, you'll see the result in the readout pane.
 Unsurprisingly, this one evaluates to `nat'.succ nat'.zero`.
 You can also define variables with `def`:
 
     def one' := nat'.succ nat'.zero
-    eval nat'.succ one'
+    #reduce nat'.succ one'
 
 That one results in `nat'.succ (nat'.succ nat'.zero)`, i.e., two.
 The type of `one'` can be inferred here, but you can also opt to write it explicitly, like this:
@@ -82,15 +82,15 @@ The `|`s separate two cases: any number `m` and zero, or any number `m` and the 
 The latter calls `add'` recursively.
 Here's how to call the function:
 
-    eval add' one' (add' one' one')
+    #reduce add' one' (add' one' one')
 
 This gives us the unary representation of three.
 
-Lean also has a cousin to `eval` that shows you the type of an expression instead of its value.
-It's called `check`:
+Lean also has a cousin to `#reduce` that shows you the type of an expression instead of its value.
+It's called `#check`:
 
-    check add' one' nat'.zero
-    check add'
+    #check add' one' nat'.zero
+    #check add'
 
 The console tells us that the first expression has the type `nat'` and that our function has the function type we expect.
 
@@ -101,8 +101,8 @@ To make things easier to write, we'll now drop our hand-written definition of `n
 Lean lets us write numbers and infix operations more naturally while still using a data type that looks very much like our `nat'` above:
 
     def answer : nat := 6 * 7
-    check answer
-    eval answer
+    #check answer
+    #eval answer
 
 The console shows us `42` instead of the long unary nesting of `succ` constructions.
 
@@ -118,7 +118,7 @@ That is, you can write other expressions that, when you `check` them, have types
 Those term expressions, according to Curry--Howard, work as proofs of the propositions they type-check as.
 For example, here's an expression of type `5 = 5`:
 
-    check eq.refl 5
+    #check eq.refl 5
 
 In the Lean standard library, `eq.refl` is just another data type constructor where `eq.refl n` has the type `n = n` for any natural number `n`.
 The idea is the same as when we defined `nat'.succ n` to have the type `nat'`.
@@ -138,14 +138,14 @@ Typing `check isSquare 4` confirms that providing a number gives you a `Prop`.
 To prove this theorem, we need a term whose type is `isSquare 4`.
 Here's one:
 
-    check Exists.intro 4 (eq.refl 16)
+    #check Exists.intro 4 (eq.refl 16)
 
 Lean's type checker tells us that this is a proof of something else, but it also serves a proof of the theorem we want.
 To check that, we can give an explicit type to the expression we're proving:
 
     def proof : isSquare 16 :=
       Exists.intro 4 (eq.refl 16)
-    check proof
+    #check proof
 
 Now Lean confirms for us: `proof` has the type `isSquare 16`, so we have proven that theorem! Woohoo!
 
@@ -180,10 +180,10 @@ We can start with a version in Lean that doesn't really use dependent types; thi
 
     -- Try it out on an example.
     def somelist := IList.cons 5 IList.nil
-    eval hd somelist
+    #reduce hd somelist
 
     -- Here's an example that produces an error.
-    eval tl IList.nil
+    #reduce tl IList.nil
 
 Lean has a special `sorry` expression that lets you apologize for not finishing a definition (often a proof).
 Here, we use it as a "run-time error" for cases where `hd` and `tl` fail on empty lists.
@@ -202,7 +202,7 @@ The curly braces after the `cons` constructor contain the type abstraction param
 Here's how you construct a list:
 
     def somelist := IList.cons 5 IList.nil
-    check somelist
+    #check somelist
 
 Notice that we didn't write the `1` that forms the type of the list---even so, Lean tells us that `somelist` has the type `IList 1`.
 It uses type inference to automatically invent that parameter.
@@ -222,9 +222,9 @@ So long, `sorry`.
 
 Armed with these definitions, let's try some operations on lists:
 
-    eval hd somelist
-    check tl somelist
-    check tl (tl somelist)  -- Error!
+    #reduce hd somelist
+    #check tl somelist
+    #check tl (tl somelist)  -- Error!
 
 The `hd` and `tl` functions work using the same syntax as before---Lean can infer all the length parameters for us.
 But if we even try to *type-check* the expression that gets the tail of our one-element list twice, we get an error.
@@ -232,8 +232,8 @@ The type system prevents us from ever running off the end of the list!
 
 If you want to explicitly provide those length parameters, lean has an @ expression that "reveals" the implicit parameters. For example, here's how we would explicitly provide length arguments to `hd` and `tl`:
 
-    eval @hd 0 somelist
-    check @tl 0 somelist
+    #reduce @hd 0 somelist
+    #check @tl 0 somelist
 
 We provide a 0 in both cases to indicate that we're passing in a list of length 1.
 Trying to provide any other number there results in a type error.
