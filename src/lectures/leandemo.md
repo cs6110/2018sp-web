@@ -102,7 +102,7 @@ Lean lets us write numbers and infix operations more naturally while still using
 
     def answer : nat := 6 * 7
     #check answer
-    #eval answer
+    #reduce answer
 
 The console shows us `42` instead of the long unary nesting of `succ` constructions.
 
@@ -134,20 +134,15 @@ Using the same syntax as we used for writing ordinary functions above, we can wr
 
     def isSquare (n : nat) := exists m, m * m = n
 
-Typing `check isSquare 4` confirms that providing a number gives you a `Prop`.
+Typing `#check isSquare 4` confirms that providing a number gives you a `Prop`.
 To prove this theorem, we need a term whose type is `isSquare 4`.
-Here's one:
-
-    #check Exists.intro 4 (eq.refl 16)
-
-Lean's type checker tells us that this is a proof of something else, but it also serves a proof of the theorem we want.
-To check that, we can give an explicit type to the expression we're proving:
+We can use a `def` to write the type we expect and a value of that type:
 
     def proof : isSquare 16 :=
       Exists.intro 4 (eq.refl 16)
     #check proof
 
-Now Lean confirms for us: `proof` has the type `isSquare 16`, so we have proven that theorem! Woohoo!
+Now Lean confirms for us: `proof` has the type `isSquare 16`, so we have proved that theorem. Woohoo!
 
 
 # Dependent List Library
