@@ -205,7 +205,7 @@ It uses type inference to automatically invent that parameter.
 Our library of operations also adds `{n : nat}` to take a length parameter in each case.
 Wherever we wrote `IList` above, we now append an argument:
 
-    def hd {n : nat}: IList (nat.succ n) -> int
+    def hd {n : nat} : IList (nat.succ n) -> int
     | (IList.cons h t) := h
 
     def tl {n : nat} : IList (nat.succ n) -> IList n
@@ -225,6 +225,8 @@ The `hd` and `tl` functions work using the same syntax as before---Lean can infe
 But if we even try to *type-check* the expression that gets the tail of our one-element list twice, we get an error.
 The type system prevents us from ever running off the end of the list!
 
+### Explicit Type Parameters
+
 If you want to explicitly provide those length parameters, lean has an @ expression that "reveals" the implicit parameters. For example, here's how we would explicitly provide length arguments to `hd` and `tl`:
 
     #reduce @hd 0 somelist
@@ -232,3 +234,40 @@ If you want to explicitly provide those length parameters, lean has an @ express
 
 We provide a 0 in both cases to indicate that we're passing in a list of length 1.
 Trying to provide any other number there results in a type error.
+
+You can also define functions differently so you can pattern-match on type-level arguments.
+Instead of putting the curly braces before the colon, use the syntax `Pi {var : type},` to introduce a "big pi" abstraction.
+For example, here's a needlessly verbose implementation of `dbl`, a function that doubles every element of a list:
+
+    def dbl : Pi {n : nat}, IList n -> IList n
+    | 0     IList.nil        := IList.nil
+    | (_+1) (IList.cons h t) := IList.cons (h*2) t
+
+That syntax pattern-matches on both `n`, the type-level argument to this function, and the term-level list argument simultaneously.
+In the first case, `n` must be zero; in the second case, it must be `n+1` for some `n`.
+We can use `_` as a wildcard, just like in OCaml, because we don't care about the value of the number.
+The function works how you expect a good `dbl` to work:
+
+    #reduce dbl somelist
+
+We can use the same principle to write one version of the dependently-typed indexing function, `get`.
+The idea is to use *two* type-level parameters: the index we're interested in, and the number of other elements in the list (minus one).
+We only want to pattern-match on the index, so our declaration for `get` will use an explicit `Pi` for only one of these numbers:
+
+    def get {n : nat} : Pi {m : nat}, IList (n+m+1) -> int
+    | 0     (IList.cons h t) := h
+    | (_+1) (IList.cons h t) := get t
+
+The second case uses a recursive call. Lean can synthesize its type-level arguments automatically. A more explicit way to write that line would be:
+
+    | (x+1) (IList.cons h t) := @get x t
+
+indicating that the index argument decreases with each recursive call.
+To use this function, we need to use the `@` form to explicitly provide the parameter we're interested in (and the first bookkeeping parameter):
+
+    def longlist := IList.cons 6 (IList.cons 1
+        (IList.cons 1 (IList.cons 0 IList.nil)))
+    #reduce @get 3 0 longlist  -- Get the first element.
+    #reduce @get 0 3 longlist  -- ...and the last element.
+
+Behind the scenes, Lean is using facts it knows about its built-in `nat` type to prove `get` safe.
