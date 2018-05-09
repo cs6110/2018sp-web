@@ -20,7 +20,9 @@
         <a href="./{{ relative '/' }}">{{ course.name }}</a>
       </h1>
       {{#each pages}}
+      {{#unless this.hide}}
       <p><a href="{{ relative this.link }}">{{ this.title }}</a></p>
+      {{/unless}}
       {{/each}}
       {{#each course.links}}
       <p><a href="{{ this.url }}">{{ this.name }}</a></p>
