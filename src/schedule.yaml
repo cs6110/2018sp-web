@@ -256,6 +256,10 @@
 -
     date: May 9
     assignments: A5 due
+    topic: Program Synthesis
+    links:
+        notes: https://www.cs.cornell.edu/~asampson/blog/minisynth.html
+        code: https://github.com/sampsyo/minisynth
 
 -
     mon: true
