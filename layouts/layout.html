@@ -17,11 +17,11 @@
   <header>
     <nav>
       <h1>
-        <a href="./{{ relative '/' }}">{{ course.name }}</a>
+        <a href="./">{{ course.name }}</a>
       </h1>
       {{#each pages}}
       {{#unless this.hide}}
-      <p><a href="{{ relative this.link }}">{{ this.title }}</a></p>
+      <p><a href=".{{ this.link }}">{{ this.title }}</a></p>
       {{/unless}}
       {{/each}}
       {{#each course.links}}

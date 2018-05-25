@@ -3,7 +3,6 @@ var markdown    = require('metalsmith-markdown');
 var layouts     = require('metalsmith-layouts');
 var sass        = require('metalsmith-sass');
 var metadata    = require('metalsmith-metadata');
-var relative    = require('metalsmith-relative');
 var collections = require('metalsmith-collections');
 var filepath    = require('metalsmith-filepath');
 var inplace     = require('metalsmith-in-place');
@@ -31,9 +30,15 @@ var site = Metalsmith(__dirname)
     course: 'course.yaml',
     schedule: 'schedule.yaml'
   }))
-  .use(relative())
   .use(define({
     resolve: url.resolve,  // Path join helper.
+    relative: function (link) {
+      if (link[0] === '/') {
+        return link.slice(1);
+      } else {
+        return link;
+      }
+    },
   }))
   .use(inplace({
     engine: "handlebars",
